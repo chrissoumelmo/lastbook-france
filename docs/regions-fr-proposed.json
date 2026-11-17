@@ -1,0 +1,1774 @@
+{
+  "_comment": "Proposal for detailed maps of France: thirteen metropolitan regions, one map each, ARA first. See docs/REGIONS-FR.md. No code reads this file.",
+  "status": "proposal",
+  "checked": "2026-11-17",
+  "codes": {
+    "proposal": "ISO 3166-2:FR-style codes, including FR-20R for Corsica, pending ISO verification.",
+    "why": "Country-prefixed identifiers keep French regions separate from US state map identifiers.",
+    "verified": "not checked: ISO OBP needed JavaScript; browser unavailable",
+    "url": "https://www.iso.org/obp/ui/#iso:code:3166:FR"
+  },
+  "layer_keys": {
+    "terrain": "terrain.sqlite",
+    "water": "water.sqlite",
+    "dams": "water.sqlite (nid part today)",
+    "crops": "crops.sqlite",
+    "buildings": "buildings.sqlite",
+    "places": "places.sqlite",
+    "addresses": "derived/geo/addresses/<code>.sqlite",
+    "pois": "poi rows in national.sqlite"
+  },
+  "licences": {
+    "etalab-2.0": {
+      "name": "Licence Ouverte / Open Licence version 2.0",
+      "url": "https://www.data.gouv.fr/pages/legal/licences/etalab-2-0",
+      "attribution": "Name the source (at least the licensor) and the date of the reused information’s last update; do not imply endorsement.",
+      "share_alike": false,
+      "verified": "opened 2026-11-17"
+    },
+    "ODbL-1.0": {
+      "name": "Open Database License 1.0",
+      "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "Credit OpenStreetMap contributors for OSM; credit data.gouv.fr and its stated sources for the contours. Keep ODbL notices and offer a publicly used derivative database under ODbL.",
+      "share_alike": true,
+      "verified": "opened 2026-11-17"
+    }
+  },
+  "country_layers": {
+    "terrain": [
+      {
+        "id": "bdalti",
+        "dataset": "BD ALTI, 25 m and 75 m",
+        "publisher": "IGN",
+        "url": "https://www.data.gouv.fr/datasets/bd-alti-r-1",
+        "licence": "etalab-2.0",
+        "format": "ASCII grid in 7z (25 m D063 feed read)",
+        "split": "By département for the checked 25 m delivery",
+        "download_urls": [
+          "https://data.geopf.fr/telechargement/resource/BDALTI?zone=D063&limit=50",
+          "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22.7z"
+        ],
+        "size_ara": "504,640,761 bytes (twelve 25 m ASCII archives; administrative ARA only)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Proposed first terrain input because 25 m is close to the existing US 1 arc-second input. All twelve département edition feeds read; total excludes checksum sidecars and neighbouring areas needed for the margin.",
+        "group": "map",
+        "ara_archives": [
+          {
+            "departement": "01",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08.7z",
+            "bytes": 44028107
+          },
+          {
+            "departement": "03",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10.7z",
+            "bytes": 41420952
+          },
+          {
+            "departement": "07",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16.7z",
+            "bytes": 41960967
+          },
+          {
+            "departement": "15",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29.7z",
+            "bytes": 48150540
+          },
+          {
+            "departement": "26",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16.7z",
+            "bytes": 51670671
+          },
+          {
+            "departement": "38",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13.7z",
+            "bytes": 50536882
+          },
+          {
+            "departement": "42",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10.7z",
+            "bytes": 42424463
+          },
+          {
+            "departement": "43",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03.7z",
+            "bytes": 45474296
+          },
+          {
+            "departement": "63",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22.7z",
+            "bytes": 39172254
+          },
+          {
+            "departement": "69",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10.7z",
+            "bytes": 30722066
+          },
+          {
+            "departement": "73",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15.7z",
+            "bytes": 38395316
+          },
+          {
+            "departement": "74",
+            "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15",
+            "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15.7z",
+            "bytes": 30684247
+          }
+        ],
+        "ara_archive_bytes": 504640761,
+        "role": "primary"
+      },
+      {
+        "id": "rgealti",
+        "dataset": "RGE ALTI, 1 m and 5 m",
+        "publisher": "IGN",
+        "url": "https://www.data.gouv.fr/datasets/rge-alti-r",
+        "licence": "etalab-2.0",
+        "format": "ASCII grid; 1 m TIFF also listed for D063; 7z archives",
+        "split": "By département; combine and clip locally",
+        "download_urls": [
+          "https://data.geopf.fr/telechargement/resource/RGEALTI?zone=D063&limit=50",
+          "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22.7z"
+        ],
+        "size_ara": "5,530,775,007 bytes (twelve 5 m ASCII archives; administrative ARA only)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Bare-earth terrain. Catalogue says source updating stopped in 2024 pending a new elevation reference. All twelve département edition feeds read; selected editions range from 2020 to 2023. Total excludes checksum sidecars and neighbouring areas needed for the margin.",
+        "group": "map",
+        "ara_archives": [
+          {
+            "departement": "01",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08.7z",
+            "bytes": 465249019
+          },
+          {
+            "departement": "03",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10.7z",
+            "bytes": 373807760
+          },
+          {
+            "departement": "07",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16.7z",
+            "bytes": 552404759
+          },
+          {
+            "departement": "15",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29.7z",
+            "bytes": 577763911
+          },
+          {
+            "departement": "26",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16.7z",
+            "bytes": 635868902
+          },
+          {
+            "departement": "38",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13.7z",
+            "bytes": 505357331
+          },
+          {
+            "departement": "42",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10.7z",
+            "bytes": 433958725
+          },
+          {
+            "departement": "43",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03.7z",
+            "bytes": 524383720
+          },
+          {
+            "departement": "63",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22.7z",
+            "bytes": 408633572
+          },
+          {
+            "departement": "69",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10.7z",
+            "bytes": 276183196
+          },
+          {
+            "departement": "73",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15.7z",
+            "bytes": 447919250
+          },
+          {
+            "departement": "74",
+            "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15",
+            "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15",
+            "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15.7z",
+            "bytes": 329244862
+          }
+        ],
+        "ara_archive_bytes": 5530775007,
+        "role": "alternative"
+      }
+    ],
+    "water": [
+      {
+        "id": "topage",
+        "dataset": "BD TOPAGE, Métropole 2026",
+        "publisher": "IGN / OFB; Sandre distribution",
+        "url": "https://www.data.gouv.fr/datasets/bd-topage-r-metropole-2026",
+        "licence": "etalab-2.0",
+        "format": "ZIP Shapefile; individual layers also GeoPackage and GeoJSON",
+        "split": "Metropolitan bulk files; no région or département archive confirmed",
+        "download_urls": [
+          "https://services.sandre.eaufrance.fr/telechargement/geo/ETH/BDTopage/2026/BD_Topage_FXX_2026-shp.zip",
+          "https://services.sandre.eaufrance.fr/telechargement/geo/ETH/BDTopage/2026/PlanEau/PlanEau_FXX-gpkg.zip"
+        ],
+        "size_ara": "Not shown",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Sandre announcement and publisher catalogue resources read. Includes watercourses, water bodies and catchments. Listed download URLs were read from metadata; bulk archives were not downloaded.",
+        "group": "map",
+        "role": "primary"
+      }
+    ],
+    "dams": [
+      {
+        "id": "roe",
+        "dataset": "Ouvrages faisant obstacle à l’écoulement (ROE / OBS)",
+        "publisher": "OFB; Sandre distribution",
+        "url": "https://www.data.gouv.fr/datasets/ouvrages-faisant-obstacle-a-lecoulement-obs",
+        "licence": "etalab-2.0",
+        "format": "WFS export: GeoPackage or zipped Shapefile",
+        "split": "National export; no pre-cut région or département archive confirmed",
+        "download_urls": [
+          "https://services.sandre.eaufrance.fr/geo/obs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typename=ObstEcoul&SRSNAME=EPSG:4326&OUTPUTFORMAT=GPKG"
+        ],
+        "size_ara": "Not shown",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Publisher metadata lists active and frozen exports separately. A barrier register is not a dam safety or storage-capacity inventory. An old obs_FXX service URL returned 404; the current catalogue points to geo/obs.",
+        "group": "map",
+        "role": "primary"
+      }
+    ],
+    "crops": [
+      {
+        "id": "rpg",
+        "dataset": "RPG 2025, anonymised agricultural parcels",
+        "publisher": "ASP / IGN / Ministry of Agriculture",
+        "url": "https://www.data.gouv.fr/datasets/rpg",
+        "licence": "etalab-2.0",
+        "format": "GeoPackage in 7z for R84, RPG delivery version 4.0",
+        "split": "France and région files; département archive not confirmed",
+        "download_urls": [
+          "https://data.geopf.fr/telechargement/resource/RPG?zone=R84&limit=50",
+          "https://data.geopf.fr/telechargement/download/RPG/RPG_4-0__GPKG_LAMB93_R84_2025-01-01/RPG_4-0__GPKG_LAMB93_R84_2025-01-01.7z"
+        ],
+        "size_ara": "1,704,509,678 bytes (R84 2025 archive)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "IGN feed and Ministry announcement read. Edition in feed: 2025-01-01; publication in 2026. Covers declared agricultural parcels, not a complete land-cover raster. Crop-code mapping was not checked.",
+        "group": "map",
+        "role": "primary"
+      }
+    ],
+    "buildings": [
+      {
+        "id": "bdtopo",
+        "dataset": "BD TOPO 3.5, buildings and named places",
+        "publisher": "IGN",
+        "url": "https://www.data.gouv.fr/datasets/bd-topo-r",
+        "licence": "etalab-2.0",
+        "format": "GeoPackage or Shapefile; 7z archive checked for R84",
+        "split": "Région and département deliveries; national alternatives in catalogue",
+        "download_urls": [
+          "https://data.geopf.fr/telechargement/resource/BDTOPO?zone=R84&limit=50",
+          "https://data.geopf.fr/telechargement/download/BDTOPO/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R84_2026-09-15/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R84_2026-09-15.7z"
+        ],
+        "size_ara": "3,496,077,209 bytes (R84 all themes, GeoPackage)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Catalogue explicitly includes building heights and named places. Archive is all themes, not buildings alone. Height completeness and meaning of each height field were not checked.",
+        "group": "map",
+        "role": "primary"
+      }
+    ],
+    "places": [
+      {
+        "id": "bdtopo",
+        "dataset": "BD TOPO 3.5, buildings and named places",
+        "publisher": "IGN",
+        "url": "https://www.data.gouv.fr/datasets/bd-topo-r",
+        "licence": "etalab-2.0",
+        "format": "GeoPackage or Shapefile; 7z archive checked for R84",
+        "split": "Région and département deliveries; national alternatives in catalogue",
+        "download_urls": [
+          "https://data.geopf.fr/telechargement/resource/BDTOPO?zone=R84&limit=50",
+          "https://data.geopf.fr/telechargement/download/BDTOPO/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R84_2026-09-15/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R84_2026-09-15.7z"
+        ],
+        "size_ara": "3,496,077,209 bytes (R84 all themes, GeoPackage)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Catalogue explicitly includes building heights and named places. Archive is all themes, not buildings alone. Height completeness and meaning of each height field were not checked.",
+        "group": "map",
+        "role": "primary"
+      },
+      {
+        "id": "insee",
+        "dataset": "Code officiel géographique, 1 January 2026",
+        "publisher": "INSEE",
+        "url": "https://www.insee.fr/fr/information/8740222",
+        "licence": "etalab-2.0",
+        "format": "UTF-8 CSV; dBase; ZIP bundle",
+        "split": "National tables with REG and DEP fields; filter locally",
+        "download_urls": [
+          "https://www.insee.fr/fr/statistiques/fichier/8740222/v_commune_2026.csv",
+          "https://www.insee.fr/fr/statistiques/fichier/8740222/v_region_2026.csv",
+          "https://www.insee.fr/fr/statistiques/fichier/8740222/v_departement_2026.csv"
+        ],
+        "size_ara": "Not shown; national commune CSV advertised as 3 Mo",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Code/name and parent-area tables, not coordinate points. INSEE terms explicitly name Licence Ouverte 2.0. Join to boundary or BAN geometry.",
+        "group": "map",
+        "role": "code and name cross-check"
+      },
+      {
+        "id": "laposte",
+        "dataset": "Base officielle des codes postaux",
+        "publisher": "La Poste",
+        "url": "https://data.laposte.fr/datasets/laposte-hexasmal",
+        "licence": "etalab-2.0",
+        "format": "CSV; alternative CSV with commune centroids",
+        "split": "National table; filter through commune codes locally",
+        "download_urls": [
+          "https://data.laposte.fr/data-fair/api/v1/datasets/laposte-hexasmal/raw",
+          "https://data.laposte.fr/data-fair/api/v1/datasets/laposte-hexasmal/metadata-attachments/base-officielle-codes-postaux.csv"
+        ],
+        "size_ara": "Not shown; raw national CSV metadata 1,555,485 bytes",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Own page and publisher data.gouv.fr metadata opened. Maps postcodes to communes; postcode boundaries are explicitly not supplied as open data. The portal’s 460 Mo display is not the raw CSV size.",
+        "group": "map",
+        "role": "postcode lookup"
+      },
+      {
+        "id": "osm",
+        "dataset": "OpenStreetMap France extracts",
+        "publisher": "OpenStreetMap contributors / Geofabrik",
+        "url": "https://download.geofabrik.de/europe/france.html",
+        "licence": "ODbL-1.0",
+        "format": "OSM PBF; regional GeoPackage links also listed",
+        "split": "Older régions, not the present thirteen; no département split listed",
+        "download_urls": [
+          "https://download.geofabrik.de/europe/france/auvergne-latest.osm.pbf",
+          "https://download.geofabrik.de/europe/france/rhone-alpes-latest.osm.pbf"
+        ],
+        "size_ara": "Auvergne 149 MB + Rhône-Alpes 508 MB (rounded page labels)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Two older-region extracts would need merging and deduplication, then cutting to the proposed box. Their combined extent was not compared with the padded box. National PBF is an alternative; parent page says 4.8 GB.",
+        "group": "map",
+        "role": "supplement"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "ban",
+        "dataset": "Base Adresse Nationale (BAN)",
+        "publisher": "IGN / DINUM; commune address authorities",
+        "url": "https://www.data.gouv.fr/datasets/base-adresse-nationale",
+        "licence": "etalab-2.0",
+        "format": "CSV.gz; Addok and BAL alternatives in catalogue",
+        "split": "National and département CSVs; no région CSV in checked directory",
+        "download_urls": [
+          "https://adresse.data.gouv.fr/data/ban/adresses/latest/csv",
+          "https://adresse.data.gouv.fr/data/ban/adresses/latest/csv/adresses-63.csv.gz"
+        ],
+        "size_ara": "About 108.49 MB, sum of twelve rounded directory labels",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Department labels read on 2026-11-17: 01 9.13 MB; 03 6.81; 07 6.95; 15 3.46; 26 8.87; 38 15.54; 42 9.71; 43 5.43; 63 12.38; 69 12.58; 73 6.90; 74 10.73. Not an exact byte total or an installed-index estimate.",
+        "group": "map",
+        "role": "primary"
+      }
+    ],
+    "pois": [
+      {
+        "id": "osm",
+        "dataset": "OpenStreetMap France extracts",
+        "publisher": "OpenStreetMap contributors / Geofabrik",
+        "url": "https://download.geofabrik.de/europe/france.html",
+        "licence": "ODbL-1.0",
+        "format": "OSM PBF; regional GeoPackage links also listed",
+        "split": "Older régions, not the present thirteen; no département split listed",
+        "download_urls": [
+          "https://download.geofabrik.de/europe/france/auvergne-latest.osm.pbf",
+          "https://download.geofabrik.de/europe/france/rhone-alpes-latest.osm.pbf"
+        ],
+        "size_ara": "Auvergne 149 MB + Rhône-Alpes 508 MB (rounded page labels)",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Two older-region extracts would need merging and deduplication, then cutting to the proposed box. Their combined extent was not compared with the padded box. National PBF is an alternative; parent page says 4.8 GB.",
+        "group": "map",
+        "role": "primary"
+      },
+      {
+        "id": "finess",
+        "dataset": "FINESS structures, new daily feed",
+        "publisher": "Agence du Numérique en Santé",
+        "url": "https://www.data.gouv.fr/datasets/finess-structures-1",
+        "licence": "etalab-2.0",
+        "format": "JSON.gz",
+        "split": "National daily file; filter locally; pre-cut area files not listed",
+        "download_urls": [
+          "https://static.data.gouv.fr/resources/finess-structures-1/20261117-032250/finess-structures-journalier-20261117.json.gz"
+        ],
+        "size_ara": "No ARA file; national daily archive 51,897,398 bytes",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Publisher metadata read via data.gouv.fr API after HTML fetch timed out. Includes closed structures: retain active geographic establishments, not legal entities. Current coordinate schema and emergency-service categories not checked.",
+        "group": "help",
+        "role": "proposed health points"
+      },
+      {
+        "id": "geodae",
+        "dataset": "Géo’DAE, public national defibrillator register",
+        "publisher": "Atlasanté / Ministry of Health",
+        "url": "https://www.data.gouv.fr/datasets/geodae-base-nationale-des-defibrillateurs",
+        "licence": "etalab-2.0",
+        "format": "CSV; JSON",
+        "split": "National public exports; filter locally; area archives not listed",
+        "download_urls": [
+          "https://static.data.gouv.fr/resources/geodae-base-nationale-des-defibrillateurs/20261117-140021/geodae.csv",
+          "https://static.data.gouv.fr/resources/geodae-base-nationale-des-defibrillateurs/20261117-140156/geodae.json"
+        ],
+        "size_ara": "No ARA file; national CSV 80,714,753 bytes; JSON 220,392,433 bytes",
+        "check": "opened",
+        "verified": "2026-11-17; opened",
+        "notes": "Only public operator-declared data is exported. Field-level access hours, status and completeness were not inspected.",
+        "group": "help",
+        "role": "proposed defibrillator points"
+      }
+    ]
+  },
+  "not_open_nationwide": [],
+  "addressing": {
+    "postal_code": {
+      "format": "Five digits, stored as text to retain leading zeros.",
+      "example_pattern": "00000"
+    },
+    "order": "Number and optional suffix, street type and name, then five-digit postcode and locality.",
+    "notes": "normalize() deletes accented letters; punctuation becomes spaces; bis remains a word. _parts() recognises a five-digit postcode only at the end and puts a separated bis among street words. No engine code was changed.",
+    "tests": [
+      {
+        "input": "73 avenue de Paris, 94165 Saint-Mandé Cedex",
+        "publisher": "IGN",
+        "source_url": "https://www.ign.fr/institut/toutes-nos-adresses",
+        "check": "opened",
+        "normalized": "73 ave de paris 94165 st mand cedex",
+        "parts": {
+          "number": "73",
+          "words": [
+            "ave",
+            "de",
+            "paris",
+            "94165",
+            "st",
+            "mand",
+            "cedex"
+          ],
+          "state": "",
+          "postcode": ""
+        }
+      },
+      {
+        "input": "12 rue de l’École de Médecine, 75006 Paris",
+        "publisher": "Université Paris Cité",
+        "source_url": "https://u-paris.fr/siege-de-luniversite-un-symbole-universitaire-au-coeur-de-paris/",
+        "check": "opened",
+        "normalized": "12 rue de l cole de m decine 75006 paris",
+        "parts": {
+          "number": "12",
+          "words": [
+            "rue",
+            "de",
+            "l",
+            "cole",
+            "de",
+            "m",
+            "decine",
+            "75006",
+            "paris"
+          ],
+          "state": "",
+          "postcode": ""
+        }
+      },
+      {
+        "input": "100 bis rue d’Assas, 75006 Paris",
+        "publisher": "Paris Musées",
+        "source_url": "https://www.zadkine.paris.fr/votre-visite/informations-pratiques",
+        "check": "opened",
+        "normalized": "100 bis rue d assas 75006 paris",
+        "parts": {
+          "number": "100",
+          "words": [
+            "bis",
+            "rue",
+            "d",
+            "assas",
+            "75006",
+            "paris"
+          ],
+          "state": "",
+          "postcode": ""
+        }
+      },
+      {
+        "input": "1 place du Trocadéro et du 11 novembre, 75116 Paris",
+        "publisher": "Cité de l’architecture et du patrimoine",
+        "source_url": "https://citedelarchitecture.fr/fr/informations-pratiques",
+        "check": "opened",
+        "normalized": "1 pl du trocad ro et du 11 novembre 75116 paris",
+        "parts": {
+          "number": "1",
+          "words": [
+            "pl",
+            "du",
+            "trocad",
+            "ro",
+            "et",
+            "du",
+            "11",
+            "novembre",
+            "75116",
+            "paris"
+          ],
+          "state": "",
+          "postcode": ""
+        }
+      },
+      {
+        "input": "2 rue de la Légion-d'Honneur, 75007 Paris",
+        "publisher": "La grande chancellerie",
+        "source_url": "https://www.legiondhonneur.fr/fr/page/le-musee",
+        "check": "opened",
+        "normalized": "2 rue de la l gion d honneur 75007 paris",
+        "parts": {
+          "number": "2",
+          "words": [
+            "rue",
+            "de",
+            "la",
+            "l",
+            "gion",
+            "d",
+            "honneur",
+            "75007",
+            "paris"
+          ],
+          "state": "",
+          "postcode": ""
+        }
+      }
+    ],
+    "source_urls": [
+      "https://www.laposte.fr/conseils-pratiques/bien-rediger-l-adresse-d-une-lettre-ou-d-un-colis",
+      "https://www.laposte.fr/envoyer/abreviation-adresses-postales"
+    ]
+  },
+  "regions": [
+    {
+      "code": "FR-IDF",
+      "name": "Île-de-France",
+      "name_en": "Île-de-France",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "11",
+      "bbox": {
+        "west": 1.4463,
+        "south": 48.120077,
+        "east": 3.559027,
+        "north": 49.241488,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          1.29,
+          47.97,
+          3.71,
+          49.4
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-CVL",
+      "name": "Centre-Val de Loire",
+      "name_en": "Centre-Val de Loire",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "24",
+      "bbox": {
+        "west": 0.052739,
+        "south": 46.346901,
+        "east": 3.128678,
+        "north": 48.941034,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          -0.1,
+          46.19,
+          3.28,
+          49.1
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-BFC",
+      "name": "Bourgogne-Franche-Comté",
+      "name_en": "Bourgogne-Franche-Comté",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "27",
+      "bbox": {
+        "west": 2.844895,
+        "south": 46.156065,
+        "east": 7.143363,
+        "north": 48.400053,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          2.69,
+          46.0,
+          7.3,
+          48.56
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-NOR",
+      "name": "Normandie",
+      "name_en": "Normandie",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "28",
+      "bbox": {
+        "west": -1.954968,
+        "south": 48.17989,
+        "east": 1.802863,
+        "north": 50.072204,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          -2.11,
+          48.02,
+          1.96,
+          50.23
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-HDF",
+      "name": "Hauts-de-France",
+      "name_en": "Hauts-de-France",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "32",
+      "bbox": {
+        "west": 1.380218,
+        "south": 48.837213,
+        "east": 4.255837,
+        "north": 51.089152,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          1.23,
+          48.68,
+          4.41,
+          51.24
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-GES",
+      "name": "Grand Est",
+      "name_en": "Grand Est",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "44",
+      "bbox": {
+        "west": 3.383684,
+        "south": 47.420341,
+        "east": 8.232497,
+        "north": 50.169299,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          3.23,
+          47.27,
+          8.39,
+          50.32
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-PDL",
+      "name": "Pays de la Loire",
+      "name_en": "Pays de la Loire",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "52",
+      "bbox": {
+        "west": -2.625436,
+        "south": 46.266742,
+        "east": 0.916651,
+        "north": 48.567994,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          -2.78,
+          46.11,
+          1.07,
+          48.72
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-BRE",
+      "name": "Bretagne",
+      "name_en": "Bretagne",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "53",
+      "bbox": {
+        "west": -5.141249,
+        "south": 47.277896,
+        "east": -1.015613,
+        "north": 48.900803,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          -5.3,
+          47.12,
+          -0.86,
+          49.06
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-NAQ",
+      "name": "Nouvelle-Aquitaine",
+      "name_en": "Nouvelle-Aquitaine",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "75",
+      "bbox": {
+        "west": -1.792351,
+        "south": 42.777857,
+        "east": 2.611285,
+        "north": 47.175991,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          -1.95,
+          42.62,
+          2.77,
+          47.33
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-OCC",
+      "name": "Occitanie",
+      "name_en": "Occitanie",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "76",
+      "bbox": {
+        "west": -0.327176,
+        "south": 42.332922,
+        "east": 4.845569,
+        "north": 45.046675,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          -0.48,
+          42.18,
+          5.0,
+          45.2
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-ARA",
+      "name": "Auvergne-Rhône-Alpes",
+      "name_en": "Auvergne-Rhône-Alpes",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "84",
+      "bbox": {
+        "west": 2.062878,
+        "south": 44.115493,
+        "east": 7.185565,
+        "north": 46.804287,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          1.91,
+          43.96,
+          7.34,
+          46.96
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-PAC",
+      "name": "Provence-Alpes-Côte d'Azur",
+      "name_en": "Provence-Alpes-Côte d'Azur",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "93",
+      "bbox": {
+        "west": 4.230216,
+        "south": 42.982029,
+        "east": 7.718984,
+        "north": 45.126844,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          4.08,
+          42.83,
+          7.87,
+          45.28
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    },
+    {
+      "code": "FR-20R",
+      "name": "Corse",
+      "name_en": "Corse",
+      "country": "France",
+      "country_iso": "FR",
+      "admin_level": "region",
+      "insee": "94",
+      "bbox": {
+        "west": 8.534683,
+        "south": 41.333553,
+        "east": 9.55999,
+        "north": 43.027639,
+        "source": {
+          "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+          "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+          "licence": "ODbL-1.0",
+          "url": "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz",
+          "verified": "2026-11-17",
+          "sha256": "84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6"
+        },
+        "padded_0_15": [
+          8.38,
+          41.18,
+          9.71,
+          43.18
+        ],
+        "padded_note": "west, south, east, north plus or minus 0.15°, rounded outward to 0.01°, as in the German proposal"
+      },
+      "layers": "country_layers",
+      "state_sources": {
+        "elevation": "BD ALTI 25 m first; RGE ALTI as alternative",
+        "buildings": "BD TOPO",
+        "addresses": "BAN",
+        "licence": "etalab-2.0",
+        "bulk": "Nationwide sources; see source_checks for delivery units",
+        "url": "https://www.data.gouv.fr/",
+        "verified": "2026-11-17"
+      }
+    }
+  ],
+  "later": [
+    {
+      "insee": "01",
+      "name": "Guadeloupe",
+      "status": "later"
+    },
+    {
+      "insee": "02",
+      "name": "Martinique",
+      "status": "later"
+    },
+    {
+      "insee": "03",
+      "name": "Guyane",
+      "status": "later"
+    },
+    {
+      "insee": "04",
+      "name": "La Réunion",
+      "status": "later"
+    },
+    {
+      "insee": "06",
+      "name": "Mayotte",
+      "status": "later"
+    }
+  ],
+  "source_checks": [
+    {
+      "id": "adminexpress",
+      "dataset": "ADMIN EXPRESS",
+      "publisher": "IGN",
+      "url": "https://www.data.gouv.fr/datasets/admin-express",
+      "licence": "etalab-2.0",
+      "format": "Shapefile in the catalogue",
+      "split": "National product; regional delivery not confirmed",
+      "download_urls": [
+        "https://geoservices.ign.fr/adminexpress#telechargement"
+      ],
+      "size_ara": "Not shown",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "IGN catalogue metadata read through data.gouv.fr. The product page redirects to a JavaScript application. The boxes in this proposal use the separately published contours instead.",
+      "group": "boundary"
+    },
+    {
+      "id": "contours",
+      "dataset": "Contours administratifs 2026, regions, 5 m generalisation",
+      "publisher": "data.gouv.fr, from IGN ADMIN EXPRESS",
+      "url": "https://www.data.gouv.fr/datasets/contours-administratifs",
+      "licence": "ODbL-1.0",
+      "format": "GeoJSON; gzip",
+      "split": "National region file; select features locally",
+      "download_urls": [
+        "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2026/geojson/regions-5m.geojson.gz"
+      ],
+      "size_ara": "No separate ARA download; national archive 8,696,324 bytes",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Archive downloaded and every region vertex read. SHA-256 84acbadd742107a8f2906c806bffafb9259d454ad8a3877a48b529d76ee29ee6. Published licence is ODbL; do not relabel this combined dataset as Licence Ouverte.",
+      "group": "boundary"
+    },
+    {
+      "id": "iso",
+      "dataset": "ISO 3166-2:FR subdivision codes",
+      "publisher": "ISO",
+      "url": "https://www.iso.org/obp/ui/#iso:code:3166:FR",
+      "licence": null,
+      "format": "JavaScript application",
+      "split": "Not applicable",
+      "download_urls": [],
+      "size_ara": "Not applicable",
+      "check": "not checked",
+      "verified": "2026-11-17; not checked",
+      "notes": "Only a JavaScript-required message was readable. Browser automation could not start. All ISO-style codes here, including proposed FR-20R for Corsica, remain unverified against ISO.",
+      "group": "boundary"
+    },
+    {
+      "id": "rgealti",
+      "dataset": "RGE ALTI, 1 m and 5 m",
+      "publisher": "IGN",
+      "url": "https://www.data.gouv.fr/datasets/rge-alti-r",
+      "licence": "etalab-2.0",
+      "format": "ASCII grid; 1 m TIFF also listed for D063; 7z archives",
+      "split": "By département; combine and clip locally",
+      "download_urls": [
+        "https://data.geopf.fr/telechargement/resource/RGEALTI?zone=D063&limit=50",
+        "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22.7z"
+      ],
+      "size_ara": "5,530,775,007 bytes (twelve 5 m ASCII archives; administrative ARA only)",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Bare-earth terrain. Catalogue says source updating stopped in 2024 pending a new elevation reference. All twelve département edition feeds read; selected editions range from 2020 to 2023. Total excludes checksum sidecars and neighbouring areas needed for the margin.",
+      "group": "map",
+      "ara_archives": [
+        {
+          "departement": "01",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D001_2023-08-08.7z",
+          "bytes": 465249019
+        },
+        {
+          "departement": "03",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D003_2023-08-10.7z",
+          "bytes": 373807760
+        },
+        {
+          "departement": "07",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D007_2022-12-16.7z",
+          "bytes": 552404759
+        },
+        {
+          "departement": "15",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D015_2022-09-29.7z",
+          "bytes": 577763911
+        },
+        {
+          "departement": "26",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D026_2022-12-16.7z",
+          "bytes": 635868902
+        },
+        {
+          "departement": "38",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D038_2020-11-13.7z",
+          "bytes": 505357331
+        },
+        {
+          "departement": "42",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D042_2023-08-10.7z",
+          "bytes": 433958725
+        },
+        {
+          "departement": "43",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D043_2022-10-03.7z",
+          "bytes": 524383720
+        },
+        {
+          "departement": "63",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D063_2021-01-22.7z",
+          "bytes": 408633572
+        },
+        {
+          "departement": "69",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D069_2023-08-10.7z",
+          "bytes": 276183196
+        },
+        {
+          "departement": "73",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D073_2020-10-15.7z",
+          "bytes": 447919250
+        },
+        {
+          "departement": "74",
+          "edition": "RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15",
+          "url": "https://data.geopf.fr/telechargement/download/RGEALTI/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15/RGEALTI_2-0_5M_ASC_LAMB93-IGN69_D074_2020-10-15.7z",
+          "bytes": 329244862
+        }
+      ],
+      "ara_archive_bytes": 5530775007
+    },
+    {
+      "id": "bdalti",
+      "dataset": "BD ALTI, 25 m and 75 m",
+      "publisher": "IGN",
+      "url": "https://www.data.gouv.fr/datasets/bd-alti-r-1",
+      "licence": "etalab-2.0",
+      "format": "ASCII grid in 7z (25 m D063 feed read)",
+      "split": "By département for the checked 25 m delivery",
+      "download_urls": [
+        "https://data.geopf.fr/telechargement/resource/BDALTI?zone=D063&limit=50",
+        "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22.7z"
+      ],
+      "size_ara": "504,640,761 bytes (twelve 25 m ASCII archives; administrative ARA only)",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Proposed first terrain input because 25 m is close to the existing US 1 arc-second input. All twelve département edition feeds read; total excludes checksum sidecars and neighbouring areas needed for the margin.",
+      "group": "map",
+      "ara_archives": [
+        {
+          "departement": "01",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2023-08-08.7z",
+          "bytes": 44028107
+        },
+        {
+          "departement": "03",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D003_2023-08-10.7z",
+          "bytes": 41420952
+        },
+        {
+          "departement": "07",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D007_2022-12-16.7z",
+          "bytes": 41960967
+        },
+        {
+          "departement": "15",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D015_2022-09-29.7z",
+          "bytes": 48150540
+        },
+        {
+          "departement": "26",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D026_2022-12-16.7z",
+          "bytes": 51670671
+        },
+        {
+          "departement": "38",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D038_2020-11-13.7z",
+          "bytes": 50536882
+        },
+        {
+          "departement": "42",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D042_2023-08-10.7z",
+          "bytes": 42424463
+        },
+        {
+          "departement": "43",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D043_2022-10-03.7z",
+          "bytes": 45474296
+        },
+        {
+          "departement": "63",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D063_2021-01-22.7z",
+          "bytes": 39172254
+        },
+        {
+          "departement": "69",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D069_2023-08-10.7z",
+          "bytes": 30722066
+        },
+        {
+          "departement": "73",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D073_2020-10-15.7z",
+          "bytes": 38395316
+        },
+        {
+          "departement": "74",
+          "edition": "BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15",
+          "metadata_url": "https://data.geopf.fr/telechargement/resource/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15",
+          "url": "https://data.geopf.fr/telechargement/download/BDALTI/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15/BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D074_2020-10-15.7z",
+          "bytes": 30684247
+        }
+      ],
+      "ara_archive_bytes": 504640761
+    },
+    {
+      "id": "topage",
+      "dataset": "BD TOPAGE, Métropole 2026",
+      "publisher": "IGN / OFB; Sandre distribution",
+      "url": "https://www.data.gouv.fr/datasets/bd-topage-r-metropole-2026",
+      "licence": "etalab-2.0",
+      "format": "ZIP Shapefile; individual layers also GeoPackage and GeoJSON",
+      "split": "Metropolitan bulk files; no région or département archive confirmed",
+      "download_urls": [
+        "https://services.sandre.eaufrance.fr/telechargement/geo/ETH/BDTopage/2026/BD_Topage_FXX_2026-shp.zip",
+        "https://services.sandre.eaufrance.fr/telechargement/geo/ETH/BDTopage/2026/PlanEau/PlanEau_FXX-gpkg.zip"
+      ],
+      "size_ara": "Not shown",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Sandre announcement and publisher catalogue resources read. Includes watercourses, water bodies and catchments. Listed download URLs were read from metadata; bulk archives were not downloaded.",
+      "group": "map"
+    },
+    {
+      "id": "roe",
+      "dataset": "Ouvrages faisant obstacle à l’écoulement (ROE / OBS)",
+      "publisher": "OFB; Sandre distribution",
+      "url": "https://www.data.gouv.fr/datasets/ouvrages-faisant-obstacle-a-lecoulement-obs",
+      "licence": "etalab-2.0",
+      "format": "WFS export: GeoPackage or zipped Shapefile",
+      "split": "National export; no pre-cut région or département archive confirmed",
+      "download_urls": [
+        "https://services.sandre.eaufrance.fr/geo/obs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typename=ObstEcoul&SRSNAME=EPSG:4326&OUTPUTFORMAT=GPKG"
+      ],
+      "size_ara": "Not shown",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Publisher metadata lists active and frozen exports separately. A barrier register is not a dam safety or storage-capacity inventory. An old obs_FXX service URL returned 404; the current catalogue points to geo/obs.",
+      "group": "map"
+    },
+    {
+      "id": "rpg",
+      "dataset": "RPG 2025, anonymised agricultural parcels",
+      "publisher": "ASP / IGN / Ministry of Agriculture",
+      "url": "https://www.data.gouv.fr/datasets/rpg",
+      "licence": "etalab-2.0",
+      "format": "GeoPackage in 7z for R84, RPG delivery version 4.0",
+      "split": "France and région files; département archive not confirmed",
+      "download_urls": [
+        "https://data.geopf.fr/telechargement/resource/RPG?zone=R84&limit=50",
+        "https://data.geopf.fr/telechargement/download/RPG/RPG_4-0__GPKG_LAMB93_R84_2025-01-01/RPG_4-0__GPKG_LAMB93_R84_2025-01-01.7z"
+      ],
+      "size_ara": "1,704,509,678 bytes (R84 2025 archive)",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "IGN feed and Ministry announcement read. Edition in feed: 2025-01-01; publication in 2026. Covers declared agricultural parcels, not a complete land-cover raster. Crop-code mapping was not checked.",
+      "group": "map"
+    },
+    {
+      "id": "bdtopo",
+      "dataset": "BD TOPO 3.5, buildings and named places",
+      "publisher": "IGN",
+      "url": "https://www.data.gouv.fr/datasets/bd-topo-r",
+      "licence": "etalab-2.0",
+      "format": "GeoPackage or Shapefile; 7z archive checked for R84",
+      "split": "Région and département deliveries; national alternatives in catalogue",
+      "download_urls": [
+        "https://data.geopf.fr/telechargement/resource/BDTOPO?zone=R84&limit=50",
+        "https://data.geopf.fr/telechargement/download/BDTOPO/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R84_2026-09-15/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R84_2026-09-15.7z"
+      ],
+      "size_ara": "3,496,077,209 bytes (R84 all themes, GeoPackage)",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Catalogue explicitly includes building heights and named places. Archive is all themes, not buildings alone. Height completeness and meaning of each height field were not checked.",
+      "group": "map"
+    },
+    {
+      "id": "insee",
+      "dataset": "Code officiel géographique, 1 January 2026",
+      "publisher": "INSEE",
+      "url": "https://www.insee.fr/fr/information/8740222",
+      "licence": "etalab-2.0",
+      "format": "UTF-8 CSV; dBase; ZIP bundle",
+      "split": "National tables with REG and DEP fields; filter locally",
+      "download_urls": [
+        "https://www.insee.fr/fr/statistiques/fichier/8740222/v_commune_2026.csv",
+        "https://www.insee.fr/fr/statistiques/fichier/8740222/v_region_2026.csv",
+        "https://www.insee.fr/fr/statistiques/fichier/8740222/v_departement_2026.csv"
+      ],
+      "size_ara": "Not shown; national commune CSV advertised as 3 Mo",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Code/name and parent-area tables, not coordinate points. INSEE terms explicitly name Licence Ouverte 2.0. Join to boundary or BAN geometry.",
+      "group": "map"
+    },
+    {
+      "id": "laposte",
+      "dataset": "Base officielle des codes postaux",
+      "publisher": "La Poste",
+      "url": "https://data.laposte.fr/datasets/laposte-hexasmal",
+      "licence": "etalab-2.0",
+      "format": "CSV; alternative CSV with commune centroids",
+      "split": "National table; filter through commune codes locally",
+      "download_urls": [
+        "https://data.laposte.fr/data-fair/api/v1/datasets/laposte-hexasmal/raw",
+        "https://data.laposte.fr/data-fair/api/v1/datasets/laposte-hexasmal/metadata-attachments/base-officielle-codes-postaux.csv"
+      ],
+      "size_ara": "Not shown; raw national CSV metadata 1,555,485 bytes",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Own page and publisher data.gouv.fr metadata opened. Maps postcodes to communes; postcode boundaries are explicitly not supplied as open data. The portal’s 460 Mo display is not the raw CSV size.",
+      "group": "map"
+    },
+    {
+      "id": "ban",
+      "dataset": "Base Adresse Nationale (BAN)",
+      "publisher": "IGN / DINUM; commune address authorities",
+      "url": "https://www.data.gouv.fr/datasets/base-adresse-nationale",
+      "licence": "etalab-2.0",
+      "format": "CSV.gz; Addok and BAL alternatives in catalogue",
+      "split": "National and département CSVs; no région CSV in checked directory",
+      "download_urls": [
+        "https://adresse.data.gouv.fr/data/ban/adresses/latest/csv",
+        "https://adresse.data.gouv.fr/data/ban/adresses/latest/csv/adresses-63.csv.gz"
+      ],
+      "size_ara": "About 108.49 MB, sum of twelve rounded directory labels",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Department labels read on 2026-11-17: 01 9.13 MB; 03 6.81; 07 6.95; 15 3.46; 26 8.87; 38 15.54; 42 9.71; 43 5.43; 63 12.38; 69 12.58; 73 6.90; 74 10.73. Not an exact byte total or an installed-index estimate.",
+      "group": "map"
+    },
+    {
+      "id": "osm",
+      "dataset": "OpenStreetMap France extracts",
+      "publisher": "OpenStreetMap contributors / Geofabrik",
+      "url": "https://download.geofabrik.de/europe/france.html",
+      "licence": "ODbL-1.0",
+      "format": "OSM PBF; regional GeoPackage links also listed",
+      "split": "Older régions, not the present thirteen; no département split listed",
+      "download_urls": [
+        "https://download.geofabrik.de/europe/france/auvergne-latest.osm.pbf",
+        "https://download.geofabrik.de/europe/france/rhone-alpes-latest.osm.pbf"
+      ],
+      "size_ara": "Auvergne 149 MB + Rhône-Alpes 508 MB (rounded page labels)",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Two older-region extracts would need merging and deduplication, then cutting to the proposed box. Their combined extent was not compared with the padded box. National PBF is an alternative; parent page says 4.8 GB.",
+      "group": "map"
+    },
+    {
+      "id": "finess_old",
+      "dataset": "FINESS Extraction du Fichier des établissements (legacy)",
+      "publisher": "Ministry of Health / ANS / Atlasanté",
+      "url": "https://www.data.gouv.fr/datasets/finess-extraction-du-fichier-des-etablissements",
+      "licence": "etalab-2.0",
+      "format": "CSV; legacy archive",
+      "split": "National files; no région or département file confirmed",
+      "download_urls": [],
+      "size_ara": "Not shown; national CSVs advertised as 45.7 Mo and 34.1 Mo",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Legacy page opened: data stopped at 2026-05-04 after FINESS+ launch on 2026-07-20. Current binary URLs were not resolved. Geocodes can be street, locality or commune-level, not necessarily the establishment entrance.",
+      "group": "help"
+    },
+    {
+      "id": "finess",
+      "dataset": "FINESS structures, new daily feed",
+      "publisher": "Agence du Numérique en Santé",
+      "url": "https://www.data.gouv.fr/datasets/finess-structures-1",
+      "licence": "etalab-2.0",
+      "format": "JSON.gz",
+      "split": "National daily file; filter locally; pre-cut area files not listed",
+      "download_urls": [
+        "https://static.data.gouv.fr/resources/finess-structures-1/20261117-032250/finess-structures-journalier-20261117.json.gz"
+      ],
+      "size_ara": "No ARA file; national daily archive 51,897,398 bytes",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Publisher metadata read via data.gouv.fr API after HTML fetch timed out. Includes closed structures: retain active geographic establishments, not legal entities. Current coordinate schema and emergency-service categories not checked.",
+      "group": "help"
+    },
+    {
+      "id": "geodae",
+      "dataset": "Géo’DAE, public national defibrillator register",
+      "publisher": "Atlasanté / Ministry of Health",
+      "url": "https://www.data.gouv.fr/datasets/geodae-base-nationale-des-defibrillateurs",
+      "licence": "etalab-2.0",
+      "format": "CSV; JSON",
+      "split": "National public exports; filter locally; area archives not listed",
+      "download_urls": [
+        "https://static.data.gouv.fr/resources/geodae-base-nationale-des-defibrillateurs/20261117-140021/geodae.csv",
+        "https://static.data.gouv.fr/resources/geodae-base-nationale-des-defibrillateurs/20261117-140156/geodae.json"
+      ],
+      "size_ara": "No ARA file; national CSV 80,714,753 bytes; JSON 220,392,433 bytes",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Only public operator-declared data is exported. Field-level access hours, status and completeness were not inspected.",
+      "group": "help"
+    },
+    {
+      "id": "georisques",
+      "dataset": "Géorisques: GASPAR, ground movements, risk layers",
+      "publisher": "Ministry of Ecological Transition / BRGM",
+      "url": "https://www.georisques.gouv.fr/donnees/bases-de-donnees",
+      "licence": "Licence Ouverte (version not specified on legal page)",
+      "format": "GASPAR delimited UTF-8 text; RGA 2026 Shapefile",
+      "split": "RGA explicitly by département; GASPAR and movement pages show regional/département selectors, which failed to load",
+      "download_urls": [],
+      "size_ara": "Not shown",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Dataset pages opened, but download selectors displayed a loading error; no working archive URL resolved. Legal page applies Licence Ouverte to downloads with exceptions for third-party-owned information. Contextual risk records, not help points.",
+      "group": "help"
+    },
+    {
+      "id": "emergency",
+      "dataset": "Emergency and listening numbers, F33954",
+      "publisher": "Service Public / DILA",
+      "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/F33954",
+      "licence": null,
+      "format": "HTML",
+      "split": "National guidance; no area split",
+      "download_urls": [
+        "https://www.service-public.gouv.fr/particuliers/vosdroits/F33954"
+      ],
+      "size_ara": "Not applicable",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Page verified by publisher on 2026-08-25. Read 112, 15, 17, 18, 114 including SMS when unable to speak, 115, 119 and 196. The checked page did not contain 3114. Content reuse terms not checked.",
+      "group": "library"
+    },
+    {
+      "id": "suicide",
+      "dataset": "3114, national suicide prevention number",
+      "publisher": "Ministry of Health",
+      "url": "https://sante.gouv.fr/prevention-en-sante/sante-mentale/promotion-et-prevention/la-prevention-du-suicide/article/le-numero-national-de-prevention-du-suicide",
+      "licence": null,
+      "format": "HTML",
+      "split": "National guidance; no area split",
+      "download_urls": [],
+      "size_ara": "Not applicable",
+      "check": "search only",
+      "verified": "2026-11-17; search only",
+      "notes": "Publisher search result names 3114; opening the page reached a human-verification challenge. Not confirmed on the Service Public page read.",
+      "group": "library"
+    },
+    {
+      "id": "tous_responsables",
+      "dataset": "Tous responsables",
+      "publisher": "SGDSN",
+      "url": "https://www.sgdsn.gouv.fr/publications/guide-tous-responsables",
+      "licence": null,
+      "format": "PDF advertised; contents unread",
+      "split": "National guide; no area split",
+      "download_urls": [
+        "https://www.sgdsn.gouv.fr/files/files/Publications/Guide_Tous%20responsables.pdf"
+      ],
+      "size_ara": "Not applicable",
+      "check": "search only",
+      "verified": "2026-11-17; search only",
+      "notes": "Publisher search result dates publication 2025-11-20 and advertises a PDF of 13,666.4 KB. Page and candidate PDF URL reached a cookie/JavaScript security wall; this URL did not yield a readable PDF. Page count, page references and reuse licence not confirmed.",
+      "group": "library"
+    },
+    {
+      "id": "kiwix",
+      "dataset": "French Wikipedia, medicine selection, Wikivoyage and Wiktionary ZIMs",
+      "publisher": "Kiwix",
+      "url": "https://download.kiwix.org/zim/",
+      "licence": null,
+      "format": "ZIM",
+      "split": "By language and project; no région or département split",
+      "download_urls": [
+        "https://download.kiwix.org/zim/wikipedia/wikipedia_fr_all_maxi_2026-05.zim",
+        "https://download.kiwix.org/zim/wikipedia/wikipedia_fr_medicine_maxi_2026-10.zim",
+        "https://download.kiwix.org/zim/wikivoyage/wikivoyage_fr_all_maxi_2026-10.zim",
+        "https://download.kiwix.org/zim/wiktionary/wiktionary_fr_all_nopic_2026-08.zim"
+      ],
+      "size_ara": "Not applicable",
+      "check": "opened",
+      "verified": "2026-11-17; opened",
+      "notes": "Publisher directories read: Wikipedia maxi 52G, nopic 12G; medicine maxi 824M; Wikivoyage maxi 237M; Wiktionary nopic 4.6G. These are directory labels, not exact byte counts. ZIMs, embedded notices and the French WikiMed app were not opened; content licences not checked.",
+      "group": "library"
+    },
+    {
+      "id": "fralert",
+      "dataset": "FR-Alert",
+      "publisher": "Ministry of the Interior",
+      "url": "https://www.fr-alert.gouv.fr/",
+      "licence": null,
+      "format": "Not confirmed",
+      "split": "Not confirmed",
+      "download_urls": [],
+      "size_ara": "Not applicable",
+      "check": "not checked",
+      "verified": "2026-11-17; not checked",
+      "notes": "Opening the official site timed out. No alert-system detail, download or reuse terms confirmed.",
+      "group": "library"
+    }
+  ],
+  "check_counts": {
+    "opened": 18,
+    "search only": 2,
+    "not checked": 2
+  },
+  "library_sources": [
+    "emergency",
+    "suicide",
+    "tous_responsables",
+    "kiwix",
+    "fralert"
+  ],
+  "context_sources": [
+    "georisques"
+  ],
+  "first_test": {
+    "code": "FR-ARA",
+    "departements": [
+      "01",
+      "03",
+      "07",
+      "15",
+      "26",
+      "38",
+      "42",
+      "43",
+      "63",
+      "69",
+      "73",
+      "74"
+    ],
+    "bdtopo_all_themes_archive_bytes": 3496077209,
+    "rpg_archive_bytes": 1704509678,
+    "ban_directory_labels_sum_mb": 108.49,
+    "installed_pack_bytes": null,
+    "terrain_ara_bytes": {
+      "BD_ALTI_25m_ASC": 504640761,
+      "RGE_ALTI_5m_ASC": 5530775007
+    }
+  },
+  "gaps": [
+    "ISO codes unverified; ISO page unreadable without JavaScript.",
+    "SGDSN guide page and candidate PDF reached a security wall; pages and reuse licence unread.",
+    "3114 seen in publisher search only, not on the Service Public page read; ministry page challenged.",
+    "FR-Alert site timed out.",
+    "No complete ARA 1 m terrain archive total was read; 25 m and 5 m totals cover the administrative region only.",
+    "Géorisques download selectors failed; archive URLs and ARA sizes unresolved.",
+    "Source archives except the boundary file were not downloaded; no map was built.",
+    "Crop code mapping, height completeness, current FINESS coordinate schema, DAE accessibility and source coverage unmeasured.",
+    "Kiwix content licences and ZIM contents not checked; no library built."
+  ]
+}
