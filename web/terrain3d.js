@@ -281,7 +281,8 @@ const Terrain3D = (() => {
     me.ro = new ResizeObserver(render); me.ro.observe(cv);
     setEx();
     const rel = hmax - hmin;
-    const base = rel < 1 ? 'No elevation data here (ocean or outside the US).' : `${matchMedia('(pointer: coarse)').matches ? 'Drag to turn and tilt · pinch to zoom' : 'Drag to rotate · scroll to zoom · shift-drag to tilt'} · ${Math.round(hmin * 3.28084).toLocaleString()}–${Math.round(hmax * 3.28084).toLocaleString()} ft`;
+    const factor = MapFormat.contourFactor(o.units), unit = o.units === 'metric' ? 'm' : 'ft';
+    const base = rel < 1 ? (o.country && o.country !== 'US' ? 'No elevation data here.' : 'No elevation data here (ocean or outside the US).') : `${matchMedia('(pointer: coarse)').matches ? 'Drag to turn and tilt · pinch to zoom' : 'Drag to rotate · scroll to zoom · shift-drag to tilt'} · ${Math.round(hmin * factor).toLocaleString()}–${Math.round(hmax * factor).toLocaleString()} ${unit}`;
     hint.textContent = base + (W <= BLDG_MAX_SPAN && Hm <= BLDG_MAX_SPAN ? ' · loading buildings…' : '');
     const note = await loadBldg();
     if (!me.alive) return;

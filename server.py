@@ -33,7 +33,7 @@ if __name__ == '__main__':  # --data must be known before the paths below are wo
 
 import engine.paths as lastbook_paths  # noqa: E402  (data folder and program folder can differ in the packaged app)
 from engine.paths import ro_uri  # noqa: E402
-from engine import saved_pages, address_search  # noqa: E402
+from engine import saved_pages, address_search, map_mode  # noqa: E402
 from engine.setup import api as setup_api  # noqa: E402  (the one module that may download: only when the person asks)
 HERE = lastbook_paths.DATA  # holds derived/
 APP = lastbook_paths.APP  # holds web/ and content/
@@ -1375,6 +1375,7 @@ def water_places(q, limit=10, near=None):
     finally:
         db.close()
     out = []
+    mode = map_mode.settings(HERE)
     for kind, name, lat, lon, raw in rows:
         d = json.loads(raw or '{}')
         text = (name + ' ' + (d.get('other_names') or '')).lower()
@@ -1385,9 +1386,10 @@ def water_places(q, limit=10, near=None):
         away = ''
         if near:
             km = haversine(near[0], near[1], lat, lon)[0]
-            away = f" · {km / 1.609:,.0f} mi away" if km >= 1.6 else ' · nearby'
+            away = map_mode.away(km, mode['units'])
         out.append((score, {'name': name, 'kind': {'dam': 'Dam', 'reservoir': 'Reservoir', 'lake': 'Lake'}[kind],
-                            'detail': (where or 'United States') + extra + away, 'lat': lat, 'lon': lon, 'source': 'water', 'onMap': True}))
+                            'detail': (where or ('France' if mode['country'] == 'FR' else 'United States')) + extra + away,
+                            'lat': lat, 'lon': lon, 'source': 'water', 'onMap': map_mode.on_map(mode, lat, lon, True)}))
     out.sort(key=lambda t: -t[0])
     return [o for _, o in out[:limit]]
 
@@ -1435,13 +1437,14 @@ def places(q, limit=20, near=None):
     rows.sort(key=lambda r: (norm(r[0]) != ql, not norm(r[0]).startswith(ql), r[5] > 2 and norm(r[0]) == ql and importance(r),
                              -round(near_bonus(home, r[3], r[4])), r[5]))
     seen, out = set(), []
+    mode = map_mode.settings(HERE)
     for name, kind, detail, lat, lon, rank, src in rows:
         k = (name.lower(), round(lat, 2), round(lon, 2))
         if k in seen:
             continue
         seen.add(k)
         out.append({'name': name, 'kind': kind, 'detail': detail, 'lat': lat, 'lon': lon, 'source': src,
-                    'onMap': bool(pack_info()) or 32.5 < lat < 35.9 and -121.4 < lon < -114.1})
+                    'onMap': map_mode.on_map(mode, lat, lon, pack_info())})
         if len(out) >= limit:
             break
     water = water_places(q, near=near)
@@ -1614,12 +1617,30 @@ def map_info():
             pass
     if AERIALDB.exists():
         geo.append({'label': 'Aerial photos, whole US (USGS The National Map: USDA NAIP and other orthoimagery)', 'status': 'Zoom 0-15 nationwide, 16 in California and towns · downloading'})
+    mode = map_mode.settings(HERE)
     pack = pack_info()
     extra = {'aerial': has_aerial()}
     if pack:
         extra.update(map_contents())
         geo = pack_datasets(extra)
-    return {**extra, 'meta': meta, 'datasets': geo, 'national': {k: v for k, v in national_status().items() if k not in ('source', 'database')}, 'version': data_version(), 'aerial_detail': detail, 'aerial_rev': rev, 'terrain_circle': tdetail}
+    if mode['country'] == 'FR':
+        extra.update(map_contents())
+        geo = french_datasets()
+    return {**extra, **mode, 'meta': meta, 'datasets': geo, 'national': {k: v for k, v in national_status().items() if k not in ('source', 'database')}, 'version': data_version(), 'aerial_detail': detail, 'aerial_rev': rev, 'terrain_circle': tdetail}
+
+
+def french_datasets():
+    """Describe installed French layers, rather than the US sources they replace."""
+    out = []
+    for path, label, status in (
+        (HERE / 'derived/geo/national.sqlite', 'Streets, places and help points (OpenStreetMap, ODbL)', 'Detail stops at the edge of this map.'),
+        (PLACEDB, 'Place names (INSEE, La Poste, OpenStreetMap)', 'Used by "Find a place"'),
+        (TERRAINDB, 'Elevation (IGN BD ALTI, Licence Ouverte 2.0)', 'Shaded relief, metric contours, spot heights and 3D'),
+        (BLDGDB, 'Buildings (IGN BD TOPO, Licence Ouverte 2.0; OpenStreetMap, ODbL)', 'Outlines and available building heights'),
+        (WATERDB, 'Water (Sandre/OFB BD TOPAGE and ROE, Licence Ouverte 2.0)', 'Lakes, rivers and recorded barriers')):
+        if path.exists():
+            out.append({'label': label, 'status': status})
+    return out
 
 
 def pack_datasets(have):

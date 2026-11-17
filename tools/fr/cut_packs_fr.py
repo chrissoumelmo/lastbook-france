@@ -19,6 +19,18 @@ from pathlib import Path
 from common import REPO, output_path, parser, readonly, selection
 
 
+def map_metadata(source):
+    """Display settings travel with the installed map, including its OSM snapshot date."""
+    with readonly(source / 'map.sqlite') as db:
+        meta = dict(db.execute('SELECT key,value FROM meta'))
+    return dict(country='FR', units='metric', data_date=meta['data_as_of'],
+                bounds=[float(v) for v in meta['bounds'].split(',')],
+                credits=[dict(text=text, licence=licence) for text, licence in (
+                    ('© OpenStreetMap contributors (ODbL)', 'ODbL'), ('IGN (Licence Ouverte 2.0)', 'Licence Ouverte 2.0'),
+                    ('INSEE', 'Licence Ouverte 2.0'), ('La Poste', 'Licence Ouverte 2.0'),
+                    ('Sandre/OFB', 'Licence Ouverte 2.0'))])
+
+
 def allowed_files():
     # state_maps.py imports publication credentials/modules at import time. Read only its
     # literal ALLOWED expression; do not import or run any publisher code.
@@ -66,7 +78,7 @@ def offline_scan(dest, code, allowed, terms_path=None):
         failures.append('Files outside state_maps.ALLOWED: ' + ','.join(sorted(rels - allowed)))
     if rels != set(manifest['files']) | {'map-set.json'}:
         failures.append('Manifest does not list exactly the files present')
-    if manifest['name'] != code or set(manifest) - {'name', 'files', 'bytes', 'seconds'}:
+    if manifest['name'] != code or set(manifest) - {'name', 'files', 'bytes', 'seconds', 'country', 'units', 'data_date', 'bounds', 'credits'}:
         failures.append('Map-set format/name mismatch')
     if manifest['bytes'] != sum(manifest['files'].values()):
         failures.append('Manifest total size mismatch')
@@ -135,7 +147,8 @@ def main():
     (geo / 'national-status.json').write_text(json.dumps(dict(state='complete', stage='ready', features=features)) + '\n')
     (geo / 'socal-cells.json').write_text('[]\n')
     sizes = {p.relative_to(dest).as_posix(): p.stat().st_size for p in sorted(dest.rglob('*')) if p.is_file()}
-    manifest = dict(name=code, files=sizes, bytes=sum(sizes.values()), seconds=round(time.monotonic() - t0, 2))
+    manifest = dict(name=code, files=sizes, bytes=sum(sizes.values()), seconds=round(time.monotonic() - t0, 2),
+                    **map_metadata(source))
     (dest / 'map-set.json').write_text(json.dumps(manifest, indent=1) + '\n')
     report = offline_scan(dest, code, allowed_files(), a.terms)
     # Keep review/build reports outside the shipped map-set contract.

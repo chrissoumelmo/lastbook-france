@@ -1,4 +1,19 @@
 'use strict';
+// Keep the original US strings; metric maps use metres and kilometres throughout.
+const MapFormat = {
+  distance: (km, units) => units === 'metric'
+    ? (km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(km < 10 ? 1 : 0) + ' km')
+    : (km < 1.6 ? Math.round(km * 1000) + ' m' : (km / 1.609).toFixed(km < 16 ? 1 : 0) + ' mi'),
+  elevation: (m, units) => units === 'metric' ? `${Math.round(m).toLocaleString()} m`
+    : `${Math.round(m * 3.28084).toLocaleString()} ft (${Math.round(m).toLocaleString()} m)`,
+  scale: (m, units) => (m >= 1000 ? m / 1000 + ' km' : m + ' m') + (units === 'metric' ? ''
+    : ' · ' + (m / 1609.34 < 1 ? Math.round(m * 3.281) + ' ft' : (m / 1609.34).toFixed(m < 5000 ? 1 : 0) + ' mi')),
+  contourRules: units => units === 'metric'
+    ? [[11, 50, 250], [12, 25, 125], [13, 10, 50], [15, 5, 25], [16, 1, 5]]
+    : [[11, 200, 1000], [12, 100, 500], [13, 40, 200], [15, 20, 100], [16, 5, 25]],
+  contourFactor: units => units === 'metric' ? 1 : 3.28084,
+  contourLabel: (height, units) => height.toLocaleString() + (units === 'metric' ? ' m' : ' ft'),
+};
 /* Offline map drawn from local vector tiles (/api/map/tile/z/x/y) with clustered help + resource pins (/api/map/pins).
    No external tiles or libraries. */
 const MapView = (() => {
@@ -79,7 +94,7 @@ const MapView = (() => {
   const y2lat = (y, z) => { const n = Math.PI - 2 * Math.PI * y / 2 ** z; return 180 / Math.PI * Math.atan(Math.sinh(n)) };
   const escH = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = id => document.getElementById(id);
-  const dist = km => km < 1.6 ? Math.round(km * 1000) + ' m' : (km / 1.609).toFixed(km < 16 ? 1 : 0) + ' mi';
+  const dist = km => MapFormat.distance(km, st?.units);
   const kmBetween = (a, b, c, d) => { const r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return 12742 * Math.asin(Math.sqrt(x)) };
   const sym = (l, size = 22) => `<i class="msym" style="background:${l.col};width:${size}px;height:${size}px">${escH(l.sym)}</i>`;
   const layerOf = cls => BY_CLS[cls] || { sym: '•', col: '#555', label: cls };
@@ -101,7 +116,7 @@ const MapView = (() => {
     if (!on.length) on = DEFAULT_LAYERS;
     main.classList.add('map-page');
     document.title = 'Map · Lastbook';
-    main.innerHTML = `<div class="maphead"><h1>Map &amp; nearby help</h1><p class="small muted">Offline: works with no internet. Shows what was mapped by 25 Oct 2026 — not damage, closures or hazards.</p>${IN_WINDOW ? '<a class="btn plain" href="/ui/setup.html#manage">Map downloads</a>' : ''}</div>
+    main.innerHTML = `<div class="maphead"><h1>Map &amp; nearby help</h1><p class="small muted">Offline: works with no internet. Shows what was mapped by <span id="map-date">25 Oct 2026</span> — not damage, closures or hazards.</p>${IN_WINDOW ? '<a class="btn plain" href="/ui/setup.html#manage">Map downloads</a>' : ''}</div>
     <div class="mapgrid"><div class="mapwrap" id="mapwrap">
       <canvas id="mapc" tabindex="0" role="application" aria-label="Map. Arrow keys move, plus and minus zoom, Escape closes details. The list beside the map gives the same places as text."></canvas>
       <div class="map-top">
@@ -161,7 +176,7 @@ const MapView = (() => {
       closeCard();
       const w = cv.clientWidth, h = cv.clientHeight;
       Terrain3D.open($('mapwrap'), { lat: st.lat, lon: st.lon, z: st.z, w, h, texture: cv, elev: elevation, demTile: (z, x, y) => demTile(z, x, y), getDem: (z, x, y) => st && st.dem.get(tileKey(z, x, y)),
-        geo: { lon2x, lat2y, x2lon, y2lat }, ver: st.ver, maxTz: tzMax(st.lat, st.lon) });
+        geo: { lon2x, lat2y, x2lon, y2lat }, units: st.units, country: st.country, ver: st.ver, maxTz: tzMax(st.lat, st.lon) });
     };
     document.addEventListener('fullscreenchange', st.onFull = () => { const f = document.fullscreenElement === $('mapwrap'); if (!f) $('mapwrap')?.classList.remove('max'); syncFull() });
     $('sethome').onclick = () => { save('mapHome', { lat: st.lat, lon: st.lon, z: Math.round(st.z) }); toastMap('Saved as your area on this device'); draw() };
@@ -176,7 +191,7 @@ const MapView = (() => {
     fetch('/api/map/info').then(r => r.json()).then(info => {
       if (!st) return;
       st.national = info.national; st.ver = info.version; st.aerialDetail = info.aerial_detail; st.aerialRev = info.aerial_rev; st.terrainCircle = info.terrain_circle;
-      describe(info); if (openWhole) fit(wholeMap(), 0.92, true); coverage(); draw();
+      describe(info); if (openWhole) fit(wholeMap(), 0.92, true); else if (st.units === 'metric') nearby(); coverage(); draw();
       $('mdata').innerHTML = info.datasets.map(d => `<li class="row" style="display:block"><b>${escH(d.label)}</b><span class="muted">${escH(d.status)}</span>${d.bytes ? ` · ${(d.bytes / 1073741824).toFixed(1)} GB` : ''}</li>`).join('') +
         (st.have && !st.have.size ? '' : `<li class="row small muted" style="display:block">${st.have ? '' : 'Not drawn yet: forest types. '}Resource layers are records — fish, wells, mines and crops show where they were recorded or mapped, not proof of what is there now.</li>`);
     }).catch(() => { $('mdata').innerHTML = '<li class="muted">Map details unavailable.</li>'; if (openWhole && st) fit(US, 0.92, true) });
@@ -191,6 +206,9 @@ const MapView = (() => {
   }
   // What this map really holds, when the server says (an older one sends none of this, and everything stays offered).
   function describe(info) {
+    st.country = info.country || 'US'; st.units = info.units || 'us';
+    if (info.credits) $('mapwrap').querySelector('.mapattr').textContent = info.credits;
+    if (info.data_date) $('map-date').textContent = info.data_date;
     if (info.aerial === false) { st.noAerial = true; st.style.aerial = false; $('map-photo')?.remove() }
     st.noContours = info.contours === false;
     if (!info.layers) return;
@@ -198,7 +216,7 @@ const MapView = (() => {
     st.on = new Set([...st.on].filter(id => offered(LAYERS.find(l => l.id === id))));
     layerCount();
     if (!st.have.size) $('near').closest('section').hidden = true;
-    if (info.bounds) { const b = $('map-us'); b.textContent = 'All'; b.title = 'Whole map'; b.setAttribute('aria-label', 'Whole map') }
+    if (info.bounds || st.country !== 'US') { const b = $('map-us'); b.textContent = 'All'; b.title = 'Whole map'; b.setAttribute('aria-label', 'Whole map') }
   }
   const offered = l => !st.have || (l && l.cls.some(c => st.have.has(c)));
   function toastMap(m) { if (typeof toast === 'function') toast(m) }
@@ -220,9 +238,9 @@ const MapView = (() => {
     const n = st?.national, el = $('mstatus'); if (!el) return;
     const inSoCal = st.lat > 32.5 && st.lat < 35.9 && st.lon > -121.4 && st.lon < -114.1;
     const b = st.bounds, outside = b && (st.lon < b[0] || st.lon > b[2] || st.lat < b[1] || st.lat > b[3]);
-    st.coverNote = n && n.state === 'building' && !inSoCal
+    st.coverNote = st.country === 'US' && n && n.state === 'building' && !inSoCal
       ? `US streets still being converted (${((n.features || 0) / 1e6).toFixed(1)}M roads & features so far) — gaps fill in automatically.`
-      : outside ? 'Outside the area this map details, only main roads, towns and water show.'
+      : outside ? (st.country === 'FR' ? 'Outside this map’s area. No map detail is installed here.' : 'Outside the area this map details, only main roads, towns and water show.')
       : st.have && !st.have.size && st.z >= 9 ? 'This download has the base map only: main roads, towns and water.' : '';
     statusLine();
   }
@@ -426,7 +444,9 @@ const MapView = (() => {
     if (!w || !h) return;
     if (cv.width !== Math.round(w * R) || cv.height !== Math.round(h * R)) { cv.width = Math.round(w * R); cv.height = Math.round(h * R) }
     const g = st.ctx; g.setTransform(R, 0, 0, R, 0, 0);
-    g.fillStyle = C.ocean; g.fillRect(0, 0, w, h);
+    // French packs have no surrounding base map. Blank coverage is neutral land,
+    // not evidence of sea; actual water polygons still draw over this background.
+    g.fillStyle = st.country === 'FR' ? C.land : C.ocean; g.fillRect(0, 0, w, h);
     const tz = Math.max(MINZ, Math.min(DATAZ, Math.floor(st.z + 0.01)));
     const ts = 256 * 2 ** (st.z - tz), cx = lon2x(st.lon, tz), cy = lat2y(st.lat, tz);
     const V = { w, h, tz, ts, cx, cy };
@@ -521,7 +541,7 @@ const MapView = (() => {
     g.strokeStyle = 'rgba(0,0,0,.3)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(w / 2 - 7, h / 2); g.lineTo(w / 2 + 7, h / 2); g.moveTo(w / 2, h / 2 - 7); g.lineTo(w / 2, h / 2 + 7); g.stroke();
     const mpp = 156543.03 * Math.cos(st.lat * Math.PI / 180) / 2 ** st.z;
     const nice = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000].find(m => m / mpp > 60) || 100000;
-    const el = $('mscale'); if (el) el.innerHTML = `<span style="display:inline-block;width:${Math.round(nice / mpp)}px;border:2px solid #333;border-top:0;height:6px;vertical-align:middle"></span> ${nice >= 1000 ? nice / 1000 + ' km' : nice + ' m'} · ${(nice / 1609.34 < 1 ? Math.round(nice * 3.281) + ' ft' : (nice / 1609.34).toFixed(nice < 5000 ? 1 : 0) + ' mi')}`;
+    const el = $('mscale'); if (el) el.innerHTML = `<span style="display:inline-block;width:${Math.round(nice / mpp)}px;border:2px solid #333;border-top:0;height:6px;vertical-align:middle"></span> ${MapFormat.scale(nice, st.units)}`;
     const at = el && el.parentNode.querySelector('.mapattr'); if (at) at.style.maxWidth = Math.max(120, el.parentNode.clientWidth - el.offsetWidth - 34) + 'px';   // the credits wrap before they reach the scale bar, however long it is
   }
 
@@ -584,10 +604,10 @@ const MapView = (() => {
     }
     g.putImageData(img, 0, 0); return t.shade = c;
   }
-  const CONTOUR = [[11, 200, 1000], [12, 100, 500], [13, 40, 200], [15, 20, 100], [16, 5, 25]];  // [from zoom, interval ft, index ft]; 5 ft only on lidar
   function contours(t, step) {
-    if (t.contours[step]) return t.contours[step];
-    const h = t.h, ft = 3.28084, lines = [];  // marching squares on the 256x256 grid, in feet
+    const key = st.units + ':' + step;
+    if (t.contours[key]) return t.contours[key];
+    const h = t.h, ft = MapFormat.contourFactor(st.units), lines = [];  // marching squares in the selected unit
     let lo = Infinity, hi = -Infinity; for (let i = 0; i < 65536; i++) { const v = h[i] * ft; if (v < lo) lo = v; if (v > hi) hi = v }
     for (let lev = Math.ceil(lo / step) * step; lev <= hi; lev += step) {
       if (lev <= 0) continue;
@@ -600,9 +620,9 @@ const MapView = (() => {
         const P = { 1: [3, 0], 2: [0, 1], 3: [3, 1], 4: [1, 2], 5: [3, 0, 1, 2], 6: [0, 2], 7: [3, 2], 8: [2, 3], 9: [0, 2], 10: [0, 1, 2, 3], 11: [1, 2], 12: [1, 3], 13: [0, 1], 14: [0, 3] }[idx];
         for (let k = 0; k < P.length; k += 2) { const p = e[P[k]], q = e[P[k + 1]]; seg.push(p[0] + .5, p[1] + .5, q[0] + .5, q[1] + .5) }
       }
-      if (seg.length) lines.push({ lev, index: lev % CONTOUR.find(c => c[1] === step)[2] === 0, seg: new Float32Array(seg) });
+      if (seg.length) lines.push({ lev, index: lev % MapFormat.contourRules(st.units).find(c => c[1] === step)[2] === 0, seg: new Float32Array(seg) });
     }
-    return t.contours[step] = lines;
+    return t.contours[key] = lines;
   }
   function terrainLayer(g, V, noRelief) {
     if (!st.style.relief && !st.style.contours) return;
@@ -629,7 +649,7 @@ const MapView = (() => {
       }
       g.restore();
     }
-    const rule = [...CONTOUR].reverse().find(c => st.z >= c[0] && (c[0] < 16 || tz > TZN));
+    const rule = [...MapFormat.contourRules(st.units)].reverse().find(c => st.z >= c[0] && (c[0] < 16 || tz > TZN));
     if (st.style.contours && rule) {
       const [, step] = rule, k = ts / 256;
       g.save(); g.lineJoin = 'round';
@@ -650,7 +670,7 @@ const MapView = (() => {
         for (const L of contours(t, step)) { if (!L.index) continue; const a = L.seg;
           for (let i = 0; i < a.length && placed.length < 24; i += 4 * 61) { const x = sx + a[i] * k, y = sy + a[i + 1] * k; if (x < 40 || x > w - 70 || y < 70 || y > h - 50) continue;
             if (placed.some(p => Math.abs(p[0] - x) < 130 && Math.abs(p[1] - y) < 70)) continue; placed.push([x, y]);
-            const s = L.lev.toLocaleString() + ' ft'; g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.85)'; g.strokeText(s, x, y); g.fillStyle = 'rgba(120,76,36,.95)'; g.fillText(s, x, y) } }
+            const s = MapFormat.contourLabel(L.lev, st.units); g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.85)'; g.strokeText(s, x, y); g.fillStyle = 'rgba(120,76,36,.95)'; g.fillText(s, x, y) } }
       }
       g.restore();
     }
@@ -747,7 +767,7 @@ const MapView = (() => {
     }
     return st ? elevAt(lat, lon) : null;
   }
-  const fmtElev = m => `${Math.round(m * 3.28084).toLocaleString()} ft (${Math.round(m).toLocaleString()} m)`;
+  const fmtElev = m => MapFormat.elevation(m, st?.units);
 
   // ------------------------------------------------------------------ card ----
   function openCard(html) {
@@ -854,7 +874,7 @@ const MapView = (() => {
       const r = await fetch(`/api/map/near?lat=${st.lat}&lon=${st.lon}&cls=${ks.join(',')}&limit=${Math.max(3, Math.ceil(14 / ks.length))}`).then(r => r.json());
       if (st !== state || serial !== st.serial.near) return;
       box.classList.remove('busy');
-      if (!Array.isArray(r) || !r.length) { box.innerHTML = '<p class="muted small">Nothing from your layers within about 100 miles of the map center.</p>'; return }
+      if (!Array.isArray(r) || !r.length) { box.innerHTML = `<p class="muted small">Nothing from your layers within about ${st.units === 'metric' ? '160 km' : '100 miles'} of the map center.</p>`; return }
       const list = r.sort((a, b) => a.km - b.km).slice(0, 14);
       box.innerHTML = list.map((p, i) => `<button data-i="${i}">${sym(layerOf(p.cls), 24)}<span><b>${escH(unnamed(p))}</b><small>${escH(layerOf(p.cls).label)} · ${dist(p.km)} ${escH(p.dir)}</small>${p.detail ? `<small>${escH(p.detail)}</small>` : ''}</span></button>`).join('');
       box.querySelectorAll('button').forEach(b => b.onclick = () => {

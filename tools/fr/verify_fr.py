@@ -14,6 +14,7 @@ import math
 import re
 import sqlite3
 import struct
+import sys
 import threading
 import zlib
 from array import array
@@ -23,6 +24,9 @@ from PIL import Image
 from shapely.geometry import LineString, box
 
 from common import REPO, parser, readonly, selection
+
+sys.path.insert(0, str(REPO))
+from engine import map_mode
 
 CLERMONT = (3.03, 45.74, 3.16, 45.82)
 LYON = (4.80, 45.73, 4.86, 45.79)
@@ -108,7 +112,7 @@ def reader_proof(pack):
     tree = ast.parse((REPO / 'server.py').read_text())
     selected = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name in names]
     assert {node.name for node in selected} == names
-    ns = dict(sqlite3=sqlite3, functools=functools, math=math, json=json, re=re, struct=struct,
+    ns = dict(sqlite3=sqlite3, functools=functools, math=math, json=json, re=re, struct=struct, map_mode=map_mode,
               zlib=zlib, array=array, Path=Path, _tls=threading.local(), HERE=pack, MAPDB=geo / 'map.sqlite',
               BLDGDB=geo / 'buildings.sqlite', WATERDB=geo / 'water.sqlite', TERRAINDB=geo / 'terrain.sqlite',
               TERRAIN_DETAIL=geo / 'terrain-detail.sqlite', CROPDB=geo / 'crops.sqlite',

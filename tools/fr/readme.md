@@ -1,7 +1,7 @@
 # French departement map builders
 
 These tools build a **single union map set** from a list of ARA departement codes.
-They do not alter the app or install/publish a pack. Default paths are outside the
+They build app-compatible files without installing or publishing a pack. Default paths are outside the
 checkout, under `/path/to/lastbook_fr_work/data/`.
 
 - One code `63` selects `FR-63`.
@@ -9,7 +9,8 @@ checkout, under `/path/to/lastbook_fr_work/data/`.
 - All twelve ARA codes select `FR-ARA`.
 - Every builder uses the selected departments' bounding-box union plus 0.15 degrees.
   Source rows in neighbouring departments inside that box are included when available.
-  Only FR-63 has been built and checked in this brief. BD TOPO input is D063 only.
+  FR-63, FR-43 and the combined FR-43_63 set have been built and checked.
+  BD TOPO inputs include D063 and D043.
 - Existing outputs are refused. Use a fresh `--output` when rebuilding; keep originals
   for review. Heavy jobs require a 20 GiB cap and at most eight workers. No GPU is used.
 
@@ -140,3 +141,78 @@ The app currently activates one map set at a time. To show two departments now,
 build one union set; independent concurrent installation requires app changes.
 See the read-only M7 audit and file:line references in `runs/brief2_status.md`.
 No real app installation, browser rendering or full ARA build was tested.
+
+## France mode and combined department sets (brief 3)
+
+`cut_packs_fr.py` adds country, units, the OSM snapshot date, the selected padded
+box and short credits with licences to `map-set.json`. Setup already carries this
+file through activation. The app reads it offline: French sources/date, metric
+contours/heights/distances/scale, a whole-map button, and search coverage based on
+the installed box. Maps without the new fields retain the original US defaults.
+The OSM date describes the map snapshot; it is not a claim that IGN, INSEE and all
+other layers have that edition date. Their own editions remain in database meta.
+
+French coverage without map detail uses a neutral land background and a coverage
+notice. Actual water polygons remain blue. This small fallback does not claim a
+coastline or detailed geography outside the installed area. The original US
+background and coverage messages are retained.
+
+One combined map is the smallest route for several departments. A single build
+merges regional OSM rows by source ID before clipping, and builds one place index
+from canonical INSEE communes and named OSM rows. Nothing merges independently
+assigned database IDs. The ordinary setup map switch installs the resulting set
+in one operation. No installer or multi-file reader changes are needed.
+
+With the retained sources, build a fresh combined set (all paths are examples):
+
+```bash
+task_project=/path/to/lastbook_fr_work
+task_python="$task_project/.venv/bin/python"
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH="$task_project/data/sources/python_deps"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+run_capped() (
+  ulimit -v 20971520
+  "$task_python" "$@"
+)
+run_capped tools/fr/fetch_terrain_fr.py 43 63
+run_capped tools/fr/fetch_buildings_fr.py 43 63
+run_capped tools/fr/fetch_water_fr.py 43 63
+run_capped tools/fr/build_pack_fr.py 43 63 \
+  --work "$task_project/data/rebuild_union" \
+  --output "$task_project/data/rebuild_union_packs/FR-43_63"
+run_capped tools/fr/verify_app_mode.py \
+  --pack "$task_project/data/rebuild_union_packs/FR-43_63" \
+  --place Clermont-Ferrand --place Le-Puy-en-Velay \
+  --overlap "$task_project/data/packs/FR-63" \
+  --overlap "$task_project/data/packs/FR-43"
+python3 -B -m unittest app.tests.test_map_mode
+```
+
+The work and output folders must be new. Source fetchers retain existing files;
+the building fetcher refuses archives over 500 MB. The combined build command
+sets a 20 GiB address-space limit inherited by its CPU-only subprocesses, and
+refuses missing department building sources. Each individual builder also accepts
+a list, so a missing layer can be built separately into a fresh output directory.
+
+The delivered combined set is `data/packs/FR-43_63`, with all five built layers.
+`verify_app_mode.py` uses the real app readers without starting a server, checks
+SQLite integrity and the setup manifest, queries both towns, and verifies that
+communes shared by the two individual packs occur once in the combined index.
+It also checks street/building vector tiles, terrain PNGs and 3D buildings in both
+places. Proofs and the disposable-copy setup activation check are under `runs/`.
+The legacy FR-63 verifier remains usable after the runtime metadata change.
+
+The four retained OSM extracts cover both selected departments. The union's
+southern padded margin extends into Aveyron and Lozere, whose regional extracts
+are not supplied. Continuous street detail in those neighbouring margins is not
+claimed. Terrain inputs cover all intersecting departments and water snapshots
+cover the whole union box. Source-specific coverage is not the same as the
+bounding-box test used by place search.
+
+Future work: independent add/remove of concurrent map sets needs an installed-set
+registry, setup/storage changes, all map readers querying several sources, stable
+publisher IDs for deduplication, and a terrain/edition priority rule. The combined
+set replaces the active set; it does not offer independent department toggles.
+Browser appearance, screenshots and a full private-terms publication scan remain
+for the launcher/reviewer. No publication or network call from the app was added.
