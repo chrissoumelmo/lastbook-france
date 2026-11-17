@@ -1,0 +1,93 @@
+{
+  "source.missing": "Source not found in this library copy",
+  "source.pdf": "<strong>Publisher</strong> · 2026 · page 4 of 123",
+  "source.video": "<strong>Collection</strong> · 4 min · transcript",
+  "source.unknown": "<strong>Unknown publisher</strong> · 12 pages",
+  "video.card": "<a class=\"vcard\" href=\"#/watch/v1?from=videos\" >\n    <span class=\"vthumb\"><span class=\"ph\"><icon>video</icon></span>\n      <span class=\"cc\" title=\"Has a transcript\">CC</span><span class=\"dur\">1:30</span><span class=\"play\"><icon>play</icon></span></span>\n    <b>A title</b><span class=\"vm\">A publisher</span></a>",
+  "back.#/videos": "<a class=\"back\" href=\"#/videos\" data-back><icon>back</icon><span>Videos</span></a>",
+  "back.#/map": "<a class=\"back\" href=\"#/map\" data-back><icon>back</icon><span>Map</span></a>",
+  "back.#/ask": "<a class=\"back\" href=\"#/ask\" data-back><icon>back</icon><span>Back to chat</span></a>",
+  "back.#/read/x": "<a class=\"back\" href=\"#/read/x\" data-back><icon>back</icon><span>Back to page</span></a>",
+  "back.#/watch/x": "<a class=\"back\" href=\"#/watch/x\" data-back><icon>back</icon><span>Video</span></a>",
+  "back.#/search?q=water": "<a class=\"back\" href=\"#/search?q=water\" data-back><icon>back</icon><span>Search results</span></a>",
+  "back.#/library": "<a class=\"back\" href=\"#/library\" data-back><icon>back</icon><span>Library</span></a>",
+  "back.#/": "<a class=\"back\" href=\"#/\" data-back><icon>back</icon><span>Videos</span></a>",
+  "error": "<div class=\"err\" role=\"alert\"><b>Something went wrong.</b><br>A failure &lt;with markup&gt;\n  <br><span class=\"small\">If this keeps happening, close Lastbook and open it again.</span></div>",
+  "coverage.empty": "",
+  "coverage.full": "10 of 13 videos have no captions or transcript, 2 PDFs are scans without text and 5 documents gave no readable text when indexed. ",
+  "coverage.one": "1 of 1 video has no captions or transcript, 1 PDF is a scan without text and 1 document gave no readable text when indexed. ",
+  "ai.about.ready": "Local AI: A model, running now. It uses 1.0 GB on CPU. It reads text only.\n      <span class=\"row\"><button class=\"btn plain\" onclick=\"localAI('stop')\">Stop it now</button><button class=\"btn plain\" onclick=\"localAI('off')\">Turn off</button></span>",
+  "ai.chat.ready": [
+    true,
+    "Local AI ready"
+  ],
+  "ai.about.stopped": "Local AI: A model, ready; it starts when you ask and stops after 15 minutes unused. It uses 1.0 GB on CPU. It reads text only.\n      <span class=\"row\"><button class=\"btn plain\" onclick=\"localAI('off')\">Turn off</button></span>",
+  "ai.chat.stopped": [
+    true,
+    "Local AI ready · it starts when you ask"
+  ],
+  "ai.about.loading": "Local AI: A model, starting. It uses 1.0 GB on CPU. It reads text only.\n      <span class=\"row\"><button class=\"btn plain\" onclick=\"localAI('off')\">Turn off</button></span>",
+  "ai.chat.loading": [
+    true,
+    "Starting the local AI 42%"
+  ],
+  "ai.about.checking": "Local AI: checking the file… <button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "ai.chat.checking": [
+    false,
+    "Checking the local AI file 42%"
+  ],
+  "ai.about.measuring": "Local AI: checking this computer’s memory… <button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "ai.chat.measuring": [
+    false,
+    "Checking this computer’s memory…"
+  ],
+  "ai.about.absent": "Local AI: not added. Add it in Library and local AI (about 17 GB). <a class=\"btn plain\" href=\"/ui/setup.html#manage\">Add the local AI</a><button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "ai.chat.absent": [
+    false,
+    "No local AI added"
+  ],
+  "ai.about.off": "The local AI is turned off. <button class=\"btn plain\" onclick=\"localAI('on')\">Turn on</button>",
+  "ai.chat.off": [
+    false,
+    "Local AI is off"
+  ],
+  "ai.about.wrong": "Local AI: wrong <button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "ai.chat.wrong": [
+    false,
+    "The local AI file is not the right one."
+  ],
+  "ai.about.too_big": "Local AI: too_big <button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "ai.chat.too_big": [
+    false,
+    "The local AI needs about 18 GB of memory."
+  ],
+  "ai.about.error": "Local AI: error <button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "ai.chat.error": [
+    false,
+    "The local AI could not start."
+  ],
+  "ai.error": "Local AI: A clear error <button class=\"btn plain\" onclick=\"localAI('rescan')\">Look again</button>",
+  "eta.0": "under a minute left",
+  "eta.35": "under a minute left",
+  "eta.61": "about 1 min left",
+  "eta.125": "about 2 min left",
+  "eta.3600": "about 1 h left",
+  "eta.7260": "about 2 h 1 min left",
+  "size.1230000": "1.2 MB",
+  "size.12800000": "13 MB",
+  "size.1200000000": "1.2 GB",
+  "size.123000000000": "123 GB",
+  "update.idle": "Version 1.1.11. <button class=\"btn plain\" data-upd=\"check\">Check for updates</button>",
+  "update.checking": "Version 1.1.11. Checking for updates…",
+  "update.up_to_date": "Version 1.1.11. Lastbook is up to date. <button class=\"btn plain\" data-upd=\"check\">Check again</button>",
+  "update.available": "Version 1.1.11. Version 2.0 is available. Download it from lastbook.org. Your library, local AI and chats stay. <button class=\"btn plain\" data-upd=\"check\">Check again</button>",
+  "update.not_published": "Version 1.1.11. No update information yet. <button class=\"btn plain\" data-upd=\"check\">Try again</button>",
+  "update.too_old_os": "Version 1.1.11. A useful message <button class=\"btn plain\" data-upd=\"check\">Try again</button>",
+  "update.error": "Version 1.1.11. A useful message <button class=\"btn plain\" data-upd=\"check\">Try again</button>",
+  "update.unversioned": "This copy has no version number (it was not built as an app). <button class=\"btn plain\" data-upd=\"check\">Check for updates</button>",
+  "steps.search": "Searched “water” (videos) — 2 passages",
+  "steps.read": "Read Manual, pages 2, 4",
+  "steps.place": "Looked up “hospital” on the offline map",
+  "video.row.": "<div><a class=\"back\" href=\"#/videos\" data-back><icon>back</icon><span>Videos</span></a></div><h1 style=\"margin-top:12px\">First aid &amp; health</h1><p class=\"lead\">Chosen to go with the survival guides</p>\n    <div class=\"vtools\"><search>Search these videos|Go</search>\n      <label class=\"sr\" for=\"vsort\">Sort</label><select id=\"vsort\"><option value=\"\" selected>Most useful first</option><option value=\"short\" >Shortest first</option><option value=\"new\" >Newest first</option><option value=\"az\" >A to Z</option></select></div>\n    <div class=\"chips\" style=\"margin:8px 0 16px\"><a class=\"chip on\" href=\"#/videos/health\">Any length</a><a class=\"chip \" href=\"#/videos/health?len=short\">Under 10 min</a><a class=\"chip \" href=\"#/videos/health?len=medium\">10–30 min</a><a class=\"chip \" href=\"#/videos/health?len=long\">Over 30 min</a></div>\n    <p class=\"muted small\">0 videos</p>\n    <div class=\"vgrid\" id=\"vg\"></div><p id=\"vmore\"></p>",
+  "video.row.water": "<div><a class=\"back\" href=\"#/videos\" data-back><icon>back</icon><span>Videos</span></a></div><h1 style=\"margin-top:12px\">Videos: “water”</h1><p class=\"lead\">Chosen to go with the survival guides</p>\n    <div class=\"vtools\"><search>Search these videos|Go</search>\n      <label class=\"sr\" for=\"vsort\">Sort</label><select id=\"vsort\"><option value=\"\" selected>Most useful first</option><option value=\"short\" >Shortest first</option><option value=\"new\" >Newest first</option><option value=\"az\" >A to Z</option></select></div>\n    <div class=\"chips\" style=\"margin:8px 0 16px\"><a class=\"chip on\" href=\"#/videos/health?q=water\">Any length</a><a class=\"chip \" href=\"#/videos/health?q=water&len=short\">Under 10 min</a><a class=\"chip \" href=\"#/videos/health?q=water&len=medium\">10–30 min</a><a class=\"chip \" href=\"#/videos/health?q=water&len=long\">Over 30 min</a></div>\n    <p class=\"muted small\">0 videos</p>\n    <div class=\"vgrid\" id=\"vg\"></div><p id=\"vmore\"></p>"
+}

@@ -1226,7 +1226,13 @@ def _default():
     return SETUP
 
 
+def interface_language(setup):
+    from engine import map_mode
+    return {'country': map_mode.settings(setup.current)['country'] if setup.current else 'US'}
+
+
 ROUTES = {
+    ('GET', 'language'): lambda s, b: interface_language(s),
     ('GET', 'state'): lambda s, b: s.state(),
     ('GET', 'job'): lambda s, b: s.public_job(),
     ('POST', 'start'): lambda s, b: s.start(b.get('pack'), bool(b.get('ai')), b.get('folder'), repair=bool(b.get('repair')), map_id=b.get('map') or None, address_id=b.get('address_id') or None),

@@ -2117,6 +2117,8 @@ class Handler(library.Handler):
                 except ValueError:
                     near_pt = None
                 return self.send_json(places(qs.get('q', '')[:100], near=near_pt))
+            if path == '/api/ui-language':
+                return self.send_json({'country': map_mode.settings(HERE)['country']})
             if path == '/api/library':
                 s = json.loads((LIB / 'summary.json').read_text(encoding='utf-8'))
                 sources = (catalog()['by_path'].get(SOURCES_PAGE) or {}).get('id')

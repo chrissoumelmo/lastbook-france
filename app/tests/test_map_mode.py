@@ -47,6 +47,8 @@ class MapFormatting(unittest.TestCase):
         script = r'''
 const fs = require('fs'), vm = require('vm'), assert = require('assert');
 const ctx = vm.createContext({location: {protocol: 'lastbook:', hostname: 'lastbook.invalid'}, devicePixelRatio: 1});
+vm.runInContext(fs.readFileSync('web/i18n.js', 'utf8'), ctx);
+vm.runInContext(`I18n.configure(${fs.readFileSync('web/i18n/en.json', 'utf8')}, {}, 'en');`, ctx);
 let source = fs.readFileSync(process.argv[1], 'utf8');
 // Expose private rendering functions only in this VM; production exports stay small.
 source = source.replace('return { page, stop };', 'return { page, stop, paint, contours, setState: s => { st = s } };');

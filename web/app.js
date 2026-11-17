@@ -44,8 +44,8 @@ const KIND_ICO = { pdf: 'page', html: 'page', video: 'video', transcript: 'video
 const TC = { hurt: '#c62828', water: '#1565c0', power: '#c77700', food: '#d4570f', shelter: '#7b3fa0', sanitation: '#7a5232', disaster: '#b23c17', comms: '#00796b',
   grow: '#2e7d32', preserve: '#a0661a', health: '#c2185b', repair: '#455a64', energy: '#e09400', land: '#5d7a2e' };
 // Short names for tiles; the full title shows on the guide page.
-const SHORT = { hurt: 'Injury & illness', water: 'Drinking water', power: 'Power is out', food: 'Food & cooking', shelter: 'Too hot or cold', sanitation: 'Toilets & hygiene',
-  disaster: 'Quake, fire, flood', comms: 'Contact & find way', grow: 'Grow food', preserve: 'Preserve food', health: 'Health care', repair: 'Repair & build', energy: 'Power systems', land: 'Land & resources' };
+const SHORT = { hurt: I18n.t("app.short.injury_illness"), water: I18n.t("app.short.drinking_water"), power: I18n.t("app.short.power_is_out"), food: I18n.t("app.short.food_cooking"), shelter: I18n.t("app.short.too_hot_or_cold"), sanitation: I18n.t("app.short.toilets_hygiene"),
+  disaster: I18n.t("app.short.quake_fire_flood"), comms: I18n.t("app.short.contact_find_way"), grow: I18n.t("app.short.grow_food"), preserve: I18n.t("app.short.preserve_food"), health: I18n.t("app.short.health_care"), repair: I18n.t("app.short.repair_build"), energy: I18n.t("app.short.power_systems"), land: I18n.t("app.short.land_resources") };
 const tcStyle = id => `style="--tc:${TC[id] || '#1a6b55'}"`;
 
 /* ------------------------------------------------------------ storage -- */
@@ -54,7 +54,7 @@ const store = {
   set(k, v) { try { localStorage.setItem('sg.' + k, JSON.stringify(v)) } catch { } },
 };
 // A row as the lists show it: its title and the subtitle under it. Two rows that read the same are one row, whatever their keys.
-const rowSub = x => x.sub && x.sub !== x.title ? x.sub : x.key[0] === 'w' ? 'Encyclopedia' : '';
+const rowSub = x => x.sub && x.sub !== x.title ? x.sub : x.key[0] === 'w' ? I18n.t("app.rowsub.encyclopedia") : '';
 const rowId = x => x.title + '|' + rowSub(x);
 function remember(item) {  // {key,title,href,sub}
   const r = store.get('recent', []).filter(x => x.key !== item.key && rowId(x) !== rowId(item));
@@ -65,13 +65,13 @@ const isSaved = key => store.get('saved', []).some(x => x.key === key);
 function savedCount() { const el = $('#savedN'); if (el) el.textContent = store.get('saved', []).length || '' }
 function toggleSave(item, btn) {
   let s = store.get('saved', []);
-  if (s.some(x => x.key === item.key)) { s = s.filter(x => x.key !== item.key); toast('Removed from Saved') }
-  else { s.unshift({ ...item, at: Date.now() }); toast('Saved on this device') }
+  if (s.some(x => x.key === item.key)) { s = s.filter(x => x.key !== item.key); toast(I18n.t("app.togglesave.removed_from_saved")) }
+  else { s.unshift({ ...item, at: Date.now() }); toast(I18n.t("app.togglesave.saved_on_this_device")) }
   store.set('saved', s);
   savedCount();
-  if (btn) { btn.setAttribute('aria-pressed', isSaved(item.key)); const sp = $('span', btn); if (sp) sp.textContent = isSaved(item.key) ? 'Saved' : 'Save' }
+  if (btn) { btn.setAttribute('aria-pressed', isSaved(item.key)); const sp = $('span', btn); if (sp) sp.textContent = isSaved(item.key) ? I18n.t("common.saved") : I18n.t("common.save") }
 }
-const saveButton = item => `<button class="btn plain" title="Save" data-save='${esc(JSON.stringify(item))}' aria-pressed="${isSaved(item.key)}">${ico('save')}<span>${isSaved(item.key) ? 'Saved' : 'Save'}</span></button>`;
+const saveButton = item => `<button class="btn plain" title="${I18n.t("common.save")}" data-save='${esc(JSON.stringify(item))}' aria-pressed="${isSaved(item.key)}">${ico('save')}<span>${isSaved(item.key) ? I18n.t("common.saved") : I18n.t("common.save")}</span></button>`;
 document.addEventListener('click', e => { const b = e.target.closest('[data-save]'); if (b) toggleSave(JSON.parse(b.dataset.save), b) });
 let toastT;
 function toast(msg) {
@@ -98,8 +98,8 @@ function setVprog(id, data) { const p = vprog(); p[id] = { ...(p[id] || {}), ...
 /* --------------------------------------------------------------- data -- */
 async function api(u, opts) {
   const r = await fetch(u, opts);
-  let d; try { d = await r.json() } catch { throw new Error('The library sent an unreadable reply.') }
-  if (!r.ok || (d && d.error && !Array.isArray(d))) throw new Error(d && d.error || ('Server error ' + r.status));
+  let d; try { d = await r.json() } catch { throw new Error(I18n.t("app.api.the_library_sent_an_unreadable_reply")) }
+  if (!r.ok || (d && d.error && !Array.isArray(d))) throw new Error(d && d.error || (I18n.t("app.api.server_error") + " " + r.status));
   return d;
 }
 let LIB = null;
@@ -124,7 +124,7 @@ const here = () => location.hash || '#/videos';
 const fromQ = () => 'from=' + encodeURIComponent(here());
 const pageImg = (id, p, w) => `/api/page/${encodeURIComponent(id)}/${p || 1}.png?w=${w}`;
 const hostOf = u => { try { return new URL(u).host } catch { return u } };   // a web address shown as its site only
-const askLink = (about, label = 'Ask about this') => `<a class="btn plain" title="${esc(label)}" href="#/ask?about=${encodeURIComponent(about)}&${fromQ()}">${ico('ask')}<span>${label}</span></a>`;
+const askLink = (about, label = I18n.t("app.asklink.ask_about_this")) => `<a class="btn plain" title="${esc(label)}" href="#/ask?about=${encodeURIComponent(about)}&${fromQ()}">${ico('ask')}<span>${label}</span></a>`;
 
 function hrefFor(item, src) {
   src = src || item.src || item;
@@ -134,12 +134,12 @@ function hrefFor(item, src) {
   return `#/read/${encodeURIComponent(src.id)}?${item.page ? 'p=' + item.page + '&' : ''}${fromQ()}`;
 }
 function srcText(s, page) {
-  if (!s) return 'Source not found in this library copy';
-  const bits = [`<strong>${esc(s.publisher || s.collection || 'Unknown publisher')}</strong>`];
+  if (!s) return I18n.t("app.srctext.source_not_found_in_this_library");
+  const bits = [`<strong>${esc(s.publisher || s.collection || I18n.t("app.bits.unknown_publisher"))}</strong>`];
   if (s.year) bits.push(esc(s.year));
-  if (page) bits.push('page ' + page + (s.pages ? ' of ' + s.pages : ''));
-  else if (s.kind === 'pdf' && s.pages) bits.push(s.pages + ' pages');
-  if (s.duration) bits.push(fmtDur(s.duration) + (s.transcript ? ' · transcript' : ''));
+  if (page) bits.push(I18n.t("common.page_word") + " " + page + (s.pages ? ' ' + I18n.t('common.of_word') + ' ' + s.pages : ''));
+  else if (s.kind === 'pdf' && s.pages) bits.push(s.pages + " " + I18n.t("common.pages_word"));
+  if (s.duration) bits.push(fmtDur(s.duration) + (s.transcript ? " " + I18n.t("app.srctext.transcript") : ''));
   return bits.join(' · ');
 }
 // A reading card shows a picture of what you'll open: the actual page, the video frame, or an encyclopedia mark.
@@ -151,7 +151,7 @@ function rcard(item) {
   else if (s && s.kind === 'pdf') pv = `<span class="pv"><img loading="lazy" alt="" src="${pageImg(s.id, item.page, 360)}" onerror="this.remove()"><span class="pg">${item.page ? 'p. ' + item.page : 'PDF'}</span></span>`;
   else pv = `<span class="pv w">${ico('page')}</span>`;
   const label = item.label || item.title || (s && s.title);
-  const src = item.zim ? `<strong>Encyclopedia</strong> · ${esc(item.title || '')} · community-written` : `${s ? 'From “' + esc(s.title) + '” · ' : ''}${srcText(s, item.page)}<br>${esc(s ? s.trust : '')}`;
+  const src = item.zim ? `<strong>${I18n.t("app.rowsub.encyclopedia")}</strong> · ${esc(item.title || '')} ${I18n.t("app.src.community_written")}` : `${s ? I18n.t("app.src.from") + esc(s.title) + '” · ' : ''}${srcText(s, item.page)}<br>${esc(s ? s.trust : '')}`;
   return `<a class="rcard" href="${hrefFor(item)}">${pv}<span><b>${esc(label)}</b>${item.note ? `<p>${esc(item.note)}</p>` : ''}<span class="src">${src}</span></span></a>`;
 }
 function rowItem(item) {
@@ -159,7 +159,7 @@ function rowItem(item) {
   let k = ico(item.zim ? 'wiki' : s ? KIND_ICO[s.kind] : 'page');
   if (s && s.kind === 'video' && s.thumb) k = `<img loading="lazy" alt="" src="${fileUrl(s.thumb)}">`;
   else if (s && s.kind === 'pdf' && (item.page || item.preview)) k = `<img loading="lazy" alt="" src="${pageImg(s.id, item.page, 200)}" onerror="this.remove()">`;
-  const sub = item.zim ? 'Encyclopedia article · community-written' : srcText(s, item.page);
+  const sub = item.zim ? I18n.t("app.sub.encyclopedia_article_community_written") : srcText(s, item.page);
   return `<li><a class="row" href="${hrefFor(item)}"><span class="k">${k}</span><span><b>${esc(item.label || item.title || (s && s.title))}</b><small>${sub}</small></span></a></li>`;
 }
 function vcard(v, opts = {}) {
@@ -167,11 +167,11 @@ function vcard(v, opts = {}) {
   const pct = p && p.t && (v.duration || p.d) ? Math.min(100, 100 * p.t / (v.duration || p.d)) : 0;
   return `<a class="vcard" href="#/watch/${encodeURIComponent(v.id)}?${fromQ()}" ${opts.style || ''}>
     <span class="vthumb">${v.thumb ? `<img loading="lazy" alt="" src="${fileUrl(v.thumb)}" onerror="this.remove()">` : `<span class="ph">${ico('video')}</span>`}
-      ${v.transcript ? '<span class="cc" title="Has a transcript">CC</span>' : ''}${v.duration ? `<span class="dur">${clock(v.duration)}</span>` : ''}${pct > 2 ? `<span class="prog" style="width:${pct}%"></span>` : ''}<span class="play">${ico('play')}</span></span>
+      ${v.transcript ? `<span class="cc" title="${I18n.t("app.vcard.has_a_transcript")}">CC</span>` : ''}${v.duration ? `<span class="dur">${clock(v.duration)}</span>` : ''}${pct > 2 ? `<span class="prog" style="width:${pct}%"></span>` : ''}<span class="play">${ico('play')}</span></span>
     <b>${esc(v.title)}</b><span class="vm">${esc(opts.sub || v.publisher || '')}</span></a>`;
 }
 function rail(html, cls = '') {
-  return `<div class="rail-wrap"><button class="rail-btn l" aria-label="Scroll left" hidden>${ico('back')}</button><div class="rail ${cls}">${html}</div><button class="rail-btn r" aria-label="Scroll right">${ico('right')}</button></div>`;
+  return `<div class="rail-wrap"><button class="rail-btn l" aria-label="${I18n.t("app.rail.scroll_left")}" hidden>${ico('back')}</button><div class="rail ${cls}">${html}</div><button class="rail-btn r" aria-label="${I18n.t("app.rail.scroll_right")}">${ico('right')}</button></div>`;
 }
 function wireRails(root = main) {
   $$('.rail-wrap', root).forEach(w => {
@@ -184,21 +184,21 @@ function wireRails(root = main) {
 }
 const secHead = (title, sub, link) => `<div class="sec-head"><div><h2>${title}</h2>${sub ? `<span class="sub">${sub}</span>` : ''}</div>${link || ''}</div>`;
 function crumbs(list) {
-  return `<nav class="crumbs" aria-label="You are here">${list.map((c, i) => i < list.length - 1 ? `<a href="${c[1]}">${esc(c[0])}</a><span aria-hidden="true">›</span>` : `<span aria-current="page">${esc(c[0])}</span>`).join('')}</nav>`;
+  return `<nav class="crumbs" aria-label="${I18n.t("app.crumbs.you_are_here")}">${list.map((c, i) => i < list.length - 1 ? `<a href="${c[1]}">${esc(c[0])}</a><span aria-hidden="true">›</span>` : `<span aria-current="page">${esc(c[0])}</span>`).join('')}</nav>`;
 }
-function backButton(from, fallback = 'Back') {
+function backButton(from, fallback = I18n.t("app.backbutton.back")) {
   let label = fallback, href = from || '#/';
   const m = /^#\/t\/([\w-]+)/.exec(href);
   if (m && topicById(m[1])) label = SHORT[m[1]] || topicById(m[1]).title;
-  else if (href.startsWith('#/search')) label = 'Search results';
-  else if (href.startsWith('#/ask')) label = 'Back to chat';
-  else if (href.startsWith('#/saved')) label = 'Saved';
-  else if (href.startsWith('#/map')) label = 'Map';
-  else if (href.startsWith('#/videos')) label = 'Videos';
-  else if (href.startsWith('#/watch')) label = 'Video';
-  else if (href.startsWith('#/read')) label = 'Back to page';
-  else if (href.startsWith('#/library') || href.startsWith('#/shelf') || href.startsWith('#/collection') || href.startsWith('#/encyclopedias') || href.startsWith('#/prepare')) label = 'Library';
-  else if (href === '#/' || href === '#') label = 'Videos';
+  else if (href.startsWith('#/search')) label = I18n.t("app.backbutton.search_results");
+  else if (href.startsWith('#/ask')) label = I18n.t("app.backbutton.back_to_chat");
+  else if (href.startsWith('#/saved')) label = I18n.t("common.saved");
+  else if (href.startsWith('#/map')) label = I18n.t("nav.map");
+  else if (href.startsWith('#/videos')) label = I18n.t("nav.videos");
+  else if (href.startsWith('#/watch')) label = I18n.t("common.video");
+  else if (href.startsWith('#/read')) label = I18n.t("app.backbutton.back_to_page");
+  else if (href.startsWith('#/library') || href.startsWith('#/shelf') || href.startsWith('#/collection') || href.startsWith('#/encyclopedias') || href.startsWith('#/prepare')) label = I18n.t("nav.library");
+  else if (href === '#/' || href === '#') label = I18n.t("nav.videos");
   return `<a class="back" href="${esc(href)}" data-back>${ico('back')}<span>${esc(label)}</span></a>`;
 }
 // Links into readers carry where you came from; refresh it at click time (sections may have opened since render).
@@ -214,12 +214,12 @@ document.addEventListener('click', e => {
   if (a && !location.hash.startsWith('#/wiki/') && navAt > 0 && navStack[navAt - 1] === a.getAttribute('href')) { e.preventDefault(); history.back() }
 });
 function errorBox(e, what) {
-  return `<div class="err" role="alert"><b>${esc(what || 'Something went wrong.')}</b><br>${esc(e.message || e)}
-  <br><span class="small">If this keeps happening, close Lastbook and open it again.</span></div>`;
+  return `<div class="err" role="alert"><b>${esc(what || I18n.t("app.errorbox.something_went_wrong"))}</b><br>${esc(I18n.error(e.message || e))}
+  <br><span class="small">${I18n.t("app.errorbox.if_this_keeps_happening_close_lastbook")}</span></div>`;
 }
 // The window title, and on reading pages the toolbar's title and the line under it.
 // bar: what the toolbar shows when it is not the page's own title (an article names itself; the toolbar names the encyclopedia).
-const setTitle = (t, sub, bar) => { document.title = t ? t + ' · Lastbook' : 'Lastbook'; const b = $('#tbTitle'); b.textContent = b.title = bar ?? t ?? ''; if (sub !== undefined) $('#tbSub').textContent = $('#tbSub').title = sub };
+const setTitle = (t, sub, bar) => { document.title = t ? t + " " + I18n.t("app.settitle.lastbook") : 'Lastbook'; const b = $('#tbTitle'); b.textContent = b.title = bar ?? t ?? ''; if (sub !== undefined) $('#tbSub').textContent = $('#tbSub').title = sub };
 
 /* ------------------------------------------------------------- router -- */
 // Where this tab is in its history. Each entry carries its own index in history.state, so Back and Forward are known exactly:
@@ -294,7 +294,7 @@ async function route() {
     else if (v === 'collection') await collectionPage(q.get('name') || '', q.get('from'));
     else if (v === 'about') await about();
     else notFound();
-  } catch (e) { setTitle(''); document.body.className = 'v-error'; main.innerHTML = emptyState('warn', 'This page could not be opened', e.message || e) }   // v-error: not a reading page, so a phone keeps its tab bar
+  } catch (e) { setTitle(''); document.body.className = 'v-error'; main.innerHTML = emptyState('warn', I18n.t("app.route.this_page_could_not_be_opened"), e.message || e) }   // v-error: not a reading page, so a phone keeps its tab bar
   wireRails(); dock(); barState();
   $('#topQ').value = '';
   const big = $('main h1'); if (big) h1seen.observe(big);
@@ -351,7 +351,7 @@ const h1seen = new IntersectionObserver(es => html.classList.toggle('h1-gone', !
 function railTitles() { const icons = html.classList.contains('compact') && !html.classList.contains('side-open'); $$('.side a.row-s').forEach(a => icons ? a.title = $('span', a).textContent : a.removeAttribute('title')) }
 addEventListener('resize', railTitles);
 // The toolbar's field says only 'Search' when it is too narrow for the whole hint, as Windows' and the Mac's own narrow fields do
-new ResizeObserver(() => { const q = $('#topQ'); if (q.clientWidth) q.placeholder = q.clientWidth < 175 ? 'Search' : 'Search the library' }).observe($('#topQ'));
+new ResizeObserver(() => { const q = $('#topQ'); if (q.clientWidth) q.placeholder = q.clientWidth < 175 ? I18n.t("common.search") : I18n.t("common.search_library") }).observe($('#topQ'));
 // At 900 and wider a page's .dock controls (view switch, Save, Ask) sit in the toolbar; narrower they stay in the page.
 const docks = () => wide.matches || (!MAC && innerWidth >= 640);
 function dock() {
@@ -413,10 +413,10 @@ document.addEventListener('keydown', e => {
     else if (document.activeElement === $('#topQ')) { $('#topQ').value = ''; $('#topQ').blur() }
   }
 });
-function notFound() { setTitle('Not found'); main.innerHTML = emptyState('search', 'That page isn’t here', 'The link may be from an older version of the guide.') }
-const emptyState = (icon, title, text) => `<div class="empty"><span class="e-ico">${ico(icon)}</span><b>${esc(title)}</b><p>${esc(text)}</p><p class="e-act"><a class="btn plain" href="#/">Go to Videos</a></p></div>`;
-function searchBox(id, value, placeholder, button = 'Search') {
-  return `<form class="bigsearch" role="search" id="${id}F">${ico('search')}<label class="sr" for="${id}">Search</label><input id="${id}" type="search" autocomplete="off" value="${esc(value || '')}" placeholder="${esc(placeholder)}" enterkeyhint="search"><button>${button}</button></form>`;
+function notFound() { setTitle(I18n.t("app.notfound.not_found")); main.innerHTML = emptyState('search', I18n.t("app.notfound.that_page_isn_t_here"), I18n.t("app.notfound.the_link_may_be_from_an")) }
+const emptyState = (icon, title, text) => `<div class="empty"><span class="e-ico">${ico(icon)}</span><b>${esc(title)}</b><p>${esc(text)}</p><p class="e-act"><a class="btn plain" href="#/">${I18n.t("app.emptystate.go_to_videos")}</a></p></div>`;
+function searchBox(id, value, placeholder, button = I18n.t("common.search")) {
+  return `<form class="bigsearch" role="search" id="${id}F">${ico('search')}<label class="sr" for="${id}">${I18n.t("common.search")}</label><input id="${id}" type="search" autocomplete="off" value="${esc(value || '')}" placeholder="${esc(placeholder)}" enterkeyhint="search"><button>${button}</button></form>`;
 }
 
 /* --------------------------------------------------------------- home -- */
@@ -427,33 +427,33 @@ async function home() {
   const pins = (await libInfo()).pins !== false;
   main.innerHTML = `
   <section class="hero">
-    <h1>What do you need?</h1>
-    <p class="lead">Pick what’s happening, search in your own words, or ask the library a question.</p>
-    ${searchBox('bigQ', '', innerWidth < 500 ? 'e.g. boil water' : 'e.g. boil water, deep cut, no power')}
-    <div class="chips examples" aria-label="Example searches">${['boil water', 'cut won’t stop bleeding', 'fridge after power cut', 'burn', 'toilet not working', 'smell gas'].map(x => `<a class="chip" href="#/search?q=${encodeURIComponent(x)}">${esc(x)}</a>`).join('')}</div>
+    <h1>${I18n.t("app.home.what_do_you_need")}</h1>
+    <p class="lead">${I18n.t("app.home.pick_what_s_happening_search_in")}</p>
+    ${searchBox('bigQ', '', innerWidth < 500 ? I18n.t("app.home.e_g_boil_water") : I18n.t("app.home.e_g_boil_water_deep_cut"))}
+    <div class="chips examples" aria-label="${I18n.t("app.home.example_searches")}">${[I18n.t("app.home.boil_water"), I18n.t("app.home.cut_won_t_stop_bleeding"), I18n.t("app.home.fridge_after_power_cut"), 'burn', I18n.t("app.home.toilet_not_working"), I18n.t("app.home.smell_gas")].map(x => `<a class="chip" href="#/search?q=${encodeURIComponent(x)}">${esc(x)}</a>`).join('')}</div>
   </section>
-  ${secHead('Need help now')}
+  ${secHead(I18n.t("app.home.need_help_now"))}
   <div class="needs">${nowTopics().map(tile).join('')}</div>
-  <div class="banners"><a class="banner chatb" href="#/ask"><span class="ico">${ico('ask')}</span><span><b>Ask the library</b><small>Get an answer built from the manuals, with the exact pages and video moments it came from</small></span><span class="go">${ico('right')}</span></a>
-  <a class="banner map" href="#/map"><span class="ico">${ico('pin')}</span><span>${pins ? '<b>Find help nearby</b><small>Hospitals, pharmacies, water taps and fire stations on an offline map</small>' : '<b>Find a place</b><small>Main roads, towns and water on an offline map</small>'}</span><span class="go">${ico('right')}</span></a></div>
-  ${cont.length ? secHead('Pick up where you left off') + rail(cont.join('')) : ''}
+  <div class="banners"><a class="banner chatb" href="#/ask"><span class="ico">${ico('ask')}</span><span><b>${I18n.t("app.home.ask_the_library")}</b><small>${I18n.t("app.home.get_an_answer_built_from_the")}</small></span><span class="go">${ico('right')}</span></a>
+  <a class="banner map" href="#/map"><span class="ico">${ico('pin')}</span><span>${pins ? `<b>${I18n.t("app.home.find_help_nearby")}</b><small>${I18n.t("app.home.hospitals_pharmacies_water_taps_and_fire")}</small>` : `<b>${I18n.t("app.home.find_a_place")}</b><small>${I18n.t("app.home.main_roads_towns_and_water_on")}</small>`}</span><span class="go">${ico('right')}</span></a></div>
+  ${cont.length ? secHead(I18n.t("app.home.pick_up_where_you_left_off")) + rail(cont.join('')) : ''}
   <div id="homeVideos"></div>
-  ${secHead('Learn a skill', 'Step-by-step routes for the weeks and months ahead', '<a href="#/library">All skills</a>')}
-  ${rail(learnTopics().map(t => `<a class="skill" href="#/t/${t.id}" ${tcStyle(t.id)}><span class="ico">${ico(t.id)}</span><b>${esc(SHORT[t.id] || t.title)}</b><small>${esc(t.short || '')}</small><span class="steps">${(t.route || []).length} steps</span></a>`).join(''), 'skills')}
-  <a class="banner prep" href="#/prepare"><span class="ico">${ico('prep')}</span><span><b>Get ready before it happens</b><small>Store water and food, plan for outages, pack kits</small></span><span class="go">${ico('right')}</span></a>`;
+  ${secHead(I18n.t("app.home.learn_a_skill"), I18n.t("app.home.step_by_step_routes_for_the"), `<a href="#/library">${I18n.t("app.home.all_skills")}</a>`)}
+  ${rail(learnTopics().map(t => `<a class="skill" href="#/t/${t.id}" ${tcStyle(t.id)}><span class="ico">${ico(t.id)}</span><b>${esc(SHORT[t.id] || t.title)}</b><small>${esc(t.short || '')}</small><span class="steps">${(t.route || []).length} ${I18n.t("app.home.steps")}</span></a>`).join(''), 'skills')}
+  <a class="banner prep" href="#/prepare"><span class="ico">${ico('prep')}</span><span><b>${I18n.t("app.home.get_ready_before_it_happens")}</b><small>${I18n.t("app.home.store_water_and_food_plan_for")}</small></span><span class="go">${ico('right')}</span></a>`;
   $('#bigQF').addEventListener('submit', e => { e.preventDefault(); location.hash = '#/search?q=' + encodeURIComponent($('#bigQ').value.trim()) });
   const ex = $('.examples', main), exEnd = () => { ex.classList.toggle('at-end', ex.scrollLeft + ex.clientWidth >= ex.scrollWidth - 4); ex.classList.toggle('at-start', ex.scrollLeft < 4) };
   ex.addEventListener('scroll', exEnd, { passive: true }); exEnd(); window.onresize = exEnd;
   try {
     const rows = await api('/api/videos');
     const g = rows.find(r => r.id === 'guides');
-    if (g && $('#homeVideos')) { $('#homeVideos').innerHTML = secHead('Watch how it’s done', 'Videos picked for the guides', '<a href="#/videos">All videos</a>') + rail(g.items.slice(0, 14).map(v => vcard(v, { style: tcStyle(v.guide) })).join('')); wireRails($('#homeVideos')) }
+    if (g && $('#homeVideos')) { $('#homeVideos').innerHTML = secHead(I18n.t("app.home.watch_how_it_s_done"), I18n.t("app.home.videos_picked_for_the_guides"), `<a href="#/videos">${I18n.t("app.home.all_videos")}</a>`) + rail(g.items.slice(0, 14).map(v => vcard(v, { style: tcStyle(v.guide) })).join('')); wireRails($('#homeVideos')) }
   } catch { }
 }
 async function continueItems() {
   const out = [], rec = await recents();
   (await resumable(12)).slice(0, 6)
-    .forEach(([id, v]) => out.push(vcard({ id, title: v.title, thumb: v.thumb, duration: v.d }, { sub: 'Resume at ' + clock(v.t) })));
+    .forEach(([id, v]) => out.push(vcard({ id, title: v.title, thumb: v.thumb, duration: v.d }, { sub: I18n.t("app.continueitems.resume_at") + " " + clock(v.t) })));
   rec.filter(r => !r.key.startsWith('v:')).slice(0, 8).forEach(r => out.push(`<a class="mini" href="${esc(r.href)}"><small>${esc(r.sub || '')}</small><b>${esc(r.title)}</b></a>`));
   return out;
 }
@@ -468,38 +468,38 @@ async function topicPage(id, open) {
   const t = topicById(id);
   if (!t) return notFound();
   setTitle(t.title);
-  remember({ key: 't:' + id, title: t.title, href: '#/t/' + id, sub: t.mode === 'learn' ? 'Learning route' : 'Guide' });
+  remember({ key: 't:' + id, title: t.title, href: '#/t/' + id, sub: t.mode === 'learn' ? I18n.t("app.topicpage.learning_route") : I18n.t("common.guide") });
   const learn = t.mode === 'learn';
   const progress = store.get('progress', {});
   const sits = (t.choices || []).map(c => c.goto
     ? `<div class="sit"><a href="#/t/${esc(c.goto)}"><span class="dot"></span><span class="tx"><b>${esc(c.label)}</b>${c.hint ? `<span>${esc(c.hint)}</span>` : ''}</span><span class="chev">${ico('right')}</span></a></div>`
     : `<div class="sit${open === c.id ? ' open' : ''}" id="c-${esc(c.id)}">
       <button aria-expanded="${open === c.id}" aria-controls="cb-${esc(c.id)}" data-choice="${esc(c.id)}"><span class="dot"></span><span class="tx"><b>${esc(c.label)}</b>${c.hint ? `<span>${esc(c.hint)}</span>` : ''}</span><span class="chev">${ico('down')}</span></button>
-      <div class="body" id="cb-${esc(c.id)}"><div class="rcards">${(c.read || []).map(rcard).join('') || '<p class="muted">Nothing picked for this yet — try searching.</p>'}</div></div></div>`).join('');
-  const limLi = l => `<li>${esc(l.text)}${l.src ? ` <span class="cite">— <a href="${hrefFor(l)}">${esc(l.src.publisher || l.src.title)}${l.page ? ', p. ' + l.page : ''}</a></span>` : l.zim ? ` <span class="cite">— <a href="${hrefFor(l)}">encyclopedia</a></span>` : ''}</li>`;
+      <div class="body" id="cb-${esc(c.id)}"><div class="rcards">${(c.read || []).map(rcard).join('') || `<p class="muted">${I18n.t("app.sits.nothing_picked_for_this_yet_try")}</p>`}</div></div></div>`).join('');
+  const limLi = l => `<li>${esc(l.text)}${l.src ? ` <span class="cite">— <a href="${hrefFor(l)}">${esc(l.src.publisher || l.src.title)}${l.page ? I18n.t('common.page_short') + ' ' + l.page : ''}</a></span>` : l.zim ? ` <span class="cite">— <a href="${hrefFor(l)}">${I18n.t("common.encyclopedia_word")}</a></span>` : ''}</li>`;
   const LIM = 4, lims = t.limits || [];
-  const limits = lims.length ? `<section class="limits" aria-labelledby="lim"><h2 id="lim">${ico('warn')}Stop and get help when…</h2><ul>${lims.slice(0, LIM).map(limLi).join('')}</ul>${lims.length > LIM ? `<details><summary>Show all ${lims.length} warnings</summary><ul>${lims.slice(LIM).map(limLi).join('')}</ul></details>` : ''}</section>` : '';
-  const disagree = (t.gaps?.disagree || []).length ? `<div class="disagree"><b>Sources disagree</b><ul>${t.gaps.disagree.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
-  const route = (t.route || []).length ? `<h2>Your learning route</h2><p class="muted small">Ticks are your own notes on this device. Reading or watching is not the same as practising safely.</p>
+  const limits = lims.length ? `<section class="limits" aria-labelledby="lim"><h2 id="lim">${ico('warn')}${I18n.t("app.limits.stop_and_get_help_when")}</h2><ul>${lims.slice(0, LIM).map(limLi).join('')}</ul>${lims.length > LIM ? `<details><summary>${I18n.t("app.limits.show_all")} ${lims.length} ${I18n.t("common.warnings_word")}</summary><ul>${lims.slice(LIM).map(limLi).join('')}</ul></details>` : ''}</section>` : '';
+  const disagree = (t.gaps?.disagree || []).length ? `<div class="disagree"><b>${I18n.t("app.disagree.sources_disagree")}</b><ul>${t.gaps.disagree.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
+  const route = (t.route || []).length ? `<h2>${I18n.t("app.route.your_learning_route")}</h2><p class="muted small">${I18n.t("app.route.ticks_are_your_own_notes_on")}</p>
     <ol class="route">${t.route.map((s, i) => { const k = id + ':' + i, p = progress[k] || {}; return `<li class="step${p.practised ? ' done' : ''}"><h3>${esc(s.title.replace(/^Step \d+:\s*/i, ''))}</h3>${s.goal ? `<p class="goal">${esc(s.goal)}</p>` : ''}
       <div class="rcards">${(s.read || []).map(rcard).join('')}</div>
-      <div class="mark"><label><input type="checkbox" data-prog="${k}" data-f="read" ${p.read ? 'checked' : ''}> I’ve read this</label><label><input type="checkbox" data-prog="${k}" data-f="practised" ${p.practised ? 'checked' : ''}> I’ve practised it with someone who knows</label></div></li>` }).join('')}</ol>` : '';
+      <div class="mark"><label><input type="checkbox" data-prog="${k}" data-f="read" ${p.read ? 'checked' : ''}> ${I18n.t("app.route.i_ve_read_this")}</label><label><input type="checkbox" data-prog="${k}" data-f="practised" ${p.practised ? 'checked' : ''}> ${I18n.t("app.route.i_ve_practised_it_with_someone")}</label></div></li>` }).join('')}</ol>` : '';
   const sec = (icon, title, items) => items && items.length ? `<details class="more"><summary>${ico(icon)}<span>${title} <span class="n">· ${items.length}</span></span></summary><div class="body"><ul class="list">${items.map(i => rowItem({ ...i, preview: true })).join('')}</ul></div></details>` : '';
   const vids = topicVideos(t);
   const related = (t.related || []).map(topicById).filter(Boolean);
-  main.innerHTML = `<div class="ghero" ${tcStyle(id)}><div class="ghero-in">${crumbs([['Videos', '#/videos'], [learn ? 'Learn a skill' : 'Need help now', learn ? '#/library' : '#/'], [SHORT[id] || t.title]])}
+  main.innerHTML = `<div class="ghero" ${tcStyle(id)}><div class="ghero-in">${crumbs([[I18n.t("nav.videos"), '#/videos'], [learn ? I18n.t("app.home.learn_a_skill") : I18n.t("app.home.need_help_now"), learn ? '#/library' : '#/'], [SHORT[id] || t.title]])}
       <div class="row1"><span class="ico">${ico(t.id)}</span><h1>${esc(t.title)}</h1></div><p class="lead">${esc(t.intro || '')}</p>
-      <div class="vactions" style="margin-bottom:0">${askLink('topic:' + id, 'Ask a question about this')}</div></div></div>
+      <div class="vactions" style="margin-bottom:0">${askLink('topic:' + id, I18n.t("app.topicpage.ask_a_question_about_this"))}</div></div></div>
     <div class="gcols" ${tcStyle(id)}><div>
-      ${(t.choices || []).length ? `<p class="ask" id="askh">${learn ? 'Where do you want to start?' : 'What’s happening?'}</p><div class="situations" aria-labelledby="askh">${sits}</div>` : ''}
+      ${(t.choices || []).length ? `<p class="ask" id="askh">${learn ? I18n.t("app.topicpage.where_do_you_want_to_start") : I18n.t("app.topicpage.what_s_happening")}</p><div class="situations" aria-labelledby="askh">${sits}</div>` : ''}
       <div class="gnarrow">${limits}${disagree}</div>
       ${route}
-      ${vids.length ? secHead('Videos for this', `${vids.length} picked video${vids.length > 1 ? 's' : ''}`) + rail(vids.map(v => vcard(v)).join('')) : ''}
-      ${sec('prep', 'Get ready before it happens', t.prepare)}
-      ${sec('book', 'Go deeper: full manuals & articles', t.learn)}
-      ${(t.gaps?.missing || []).length ? `<details class="more"><summary>${ico('warn')}<span>Not in this library</span></summary><div class="body"><p class="muted small" style="margin-top:0">Looked for but not found when this guide was put together (October 2026):</p><ul>${t.gaps.missing.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div></details>` : ''}
-      ${related.length ? `<h2>Related guides</h2><div class="related">${related.map(r => `<a class="chip" href="#/t/${r.id}" ${tcStyle(r.id)}><span style="color:var(--tc)">${ico(r.id)}</span>${esc(SHORT[r.id] || r.title)}</a>`).join('')}</div>` : ''}
-    </div><aside class="gside" aria-label="Safety"></aside></div>`;
+      ${vids.length ? secHead(I18n.t("app.topicpage.videos_for_this"), `${vids.length} ${I18n.t("app.topicpage.picked_video")}${vids.length > 1 ? 's' : ''}`) + rail(vids.map(v => vcard(v)).join('')) : ''}
+      ${sec('prep', I18n.t("app.home.get_ready_before_it_happens"), t.prepare)}
+      ${sec('book', I18n.t("app.topicpage.go_deeper_full_manuals_articles"), t.learn)}
+      ${(t.gaps?.missing || []).length ? `<details class="more"><summary>${ico('warn')}<span>${I18n.t("app.topicpage.not_in_this_library")}</span></summary><div class="body"><p class="muted small" style="margin-top:0">${I18n.t("app.topicpage.looked_for_but_not_found_when")}</p><ul>${t.gaps.missing.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div></details>` : ''}
+      ${related.length ? `<h2>${I18n.t("app.topicpage.related_guides")}</h2><div class="related">${related.map(r => `<a class="chip" href="#/t/${r.id}" ${tcStyle(r.id)}><span style="color:var(--tc)">${ico(r.id)}</span>${esc(SHORT[r.id] || r.title)}</a>`).join('')}</div>` : ''}
+    </div><aside class="gside" aria-label="${I18n.t("common.safety")}"></aside></div>`;
   // On wide screens the safety box sits beside the choices so it stays visible.
   const side = $('.gside', main), nar = $('.gnarrow', main);
   const placeSide = () => { if (!side || !nar) return; if (innerWidth >= 1050) { if (!side.firstChild) side.append(...nar.childNodes) } else if (side.firstChild) nar.append(...side.childNodes) };
@@ -520,20 +520,20 @@ async function topicPage(id, open) {
 
 /* ------------------------------------------------------------- videos -- */
 async function videosHome() {
-  setTitle('Videos');
-  main.innerHTML = `<h1>Videos</h1><p class="lead">Watch it done — practical how-tos first, then channels and courses.</p>
-    <div class="vtools">${searchBox('vq', '', 'Search video titles')}</div>
-    <div class="chips" style="margin-top:8px">${[['short', 'Under 10 min'], ['medium', '10–30 min'], ['long', 'Over 30 min']].map(([k, l]) => `<a class="chip" href="#/videos/all?len=${k}">${ico('clock')}${l}</a>`).join('')}</div>
-    <div id="vrows"><p class="loading">Loading videos…</p></div>`;
+  setTitle(I18n.t("nav.videos"));
+  main.innerHTML = `<h1>${I18n.t("nav.videos")}</h1><p class="lead">${I18n.t("videos.intro")}</p>
+    <div class="vtools">${searchBox('vq', '', I18n.t("videos.search.placeholder"))}</div>
+    <div class="chips" style="margin-top:8px">${[['short', I18n.t("app.videoshome.under_10_min")], ['medium', I18n.t("app.videoshome.10_30_min")], ['long', I18n.t("app.videoshome.over_30_min")]].map(([k, l]) => `<a class="chip" href="#/videos/all?len=${k}">${ico('clock')}${l}</a>`).join('')}</div>
+    <div id="vrows"><p class="loading">${I18n.t("videos.loading")}</p></div>`;
   $('#vqF').addEventListener('submit', e => { e.preventDefault(); location.hash = '#/videos/all?q=' + encodeURIComponent($('#vq').value.trim()) });
   const rows = await api('/api/videos');
   const cont = (await resumable(20)).slice(0, 12);
   const GCOL = { health: 'hurt', water: 'water', food: 'food', power: 'power', outdoors: 'shelter', repair: 'repair', making: 'land' };
   $('#vrows').innerHTML =
-    (cont.length ? secHead('Continue watching') + rail(cont.map(([id, v]) => vcard({ id, title: v.title, thumb: v.thumb, duration: v.d }, { sub: 'Resume at ' + clock(v.t) })).join('')) : '') +
-    rows.map(r => secHead(esc(r.title), r.note ? esc(r.note) : '', `<a href="#/videos/${r.id}">See all ${r.count}</a>`) +
+    (cont.length ? secHead(I18n.t("videos.resume.title")) + rail(cont.map(([id, v]) => vcard({ id, title: v.title, thumb: v.thumb, duration: v.d }, { sub: I18n.t("app.continueitems.resume_at") + " " + clock(v.t) })).join('')) : '') +
+    rows.map(r => secHead(esc(I18n.label(r.title)), r.note ? esc(I18n.label(r.note)) : '', `<a href="#/videos/${r.id}">${I18n.t("app.videoshome.see_all")} ${r.count}</a>`) +
       rail(r.items.map(v => vcard(v, { style: tcStyle(v.guide || GCOL[r.id]) })).join(''))).join('') +
-    `<p class="small muted" style="margin-top:24px">Only videos already downloaded are shown. Many have no captions, so the transcript search and the assistant can’t see what’s said in them.</p>`;
+    `<p class="small muted" style="margin-top:24px">${I18n.t("videos.downloaded_note")}</p>`;
   wireRails();
 }
 async function videoRow(row, q) {
@@ -542,18 +542,18 @@ async function videoRow(row, q) {
   const qs = o => { const p = new URLSearchParams({ q: qq, len, sort, ...o }); for (const [k, v] of [...p]) if (!v) p.delete(k); const s = p.toString(); return base + (s ? '?' + s : '') };
   let off = 0;
   const first = await api(`/api/videos/${row}?q=${encodeURIComponent(qq)}&len=${len}&sort=${sort}&offset=0`);
-  setTitle(first.title);
-  main.innerHTML = `<div>${backButton('#/videos', 'Videos')}</div><h1 style="margin-top:12px">${esc(qq ? 'Videos: “' + qq + '”' : first.title)}</h1>${first.note ? `<p class="lead">${esc(first.note)}</p>` : ''}
-    <div class="vtools">${searchBox('vq', qq, 'Search these videos', 'Go')}
-      <label class="sr" for="vsort">Sort</label><select id="vsort">${[['', 'Most useful first'], ['short', 'Shortest first'], ['new', 'Newest first'], ['az', 'A to Z']].map(([k, l]) => `<option value="${k}" ${k === sort ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-    <div class="chips" style="margin:8px 0 16px">${[['', 'Any length'], ['short', 'Under 10 min'], ['medium', '10–30 min'], ['long', 'Over 30 min']].map(([k, l]) => `<a class="chip ${k === len ? 'on' : ''}" href="${qs({ len: k })}">${l}</a>`).join('')}</div>
-    <p class="muted small">${first.total.toLocaleString()} video${first.total === 1 ? '' : 's'}</p>
+  setTitle(I18n.label(first.title));
+  main.innerHTML = `<div>${backButton('#/videos', I18n.t("nav.videos"))}</div><h1 style="margin-top:12px">${esc(qq ? I18n.t("app.videorow.videos") + qq + '”' : I18n.label(first.title))}</h1>${first.note ? `<p class="lead">${esc(I18n.label(first.note))}</p>` : ''}
+    <div class="vtools">${searchBox('vq', qq, I18n.t("app.videorow.search_these_videos"), I18n.t("app.videorow.go"))}
+      <label class="sr" for="vsort">${I18n.t("videos.sort.label")}</label><select id="vsort">${[['', I18n.t("app.videorow.most_useful_first")], ['short', I18n.t("app.videorow.shortest_first")], ['new', I18n.t("app.videorow.newest_first")], ['az', I18n.t("app.videorow.a_to_z")]].map(([k, l]) => `<option value="${k}" ${k === sort ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="chips" style="margin:8px 0 16px">${[['', I18n.t("videos.filter.any_length")], ['short', I18n.t("app.videoshome.under_10_min")], ['medium', I18n.t("app.videoshome.10_30_min")], ['long', I18n.t("app.videoshome.over_30_min")]].map(([k, l]) => `<a class="chip ${k === len ? 'on' : ''}" href="${qs({ len: k })}">${l}</a>`).join('')}</div>
+    <p class="muted small">${first.total.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.videorow.video")}${first.total === 1 ? '' : 's'}</p>
     <div class="vgrid" id="vg"></div><p id="vmore"></p>`;
   $('#vqF').addEventListener('submit', e => { e.preventDefault(); location.hash = qs({ q: $('#vq').value.trim() }) });
   $('#vsort').addEventListener('change', e => { location.hash = qs({ sort: e.target.value }) });
   const add = d => {
-    $('#vg').insertAdjacentHTML('beforeend', d.items.map(v => vcard(v)).join('') || (off ? '' : '<div class="empty" style="grid-column:1/-1">No videos match. Try another word or length.</div>'));
-    $('#vmore').innerHTML = d.more ? '<button class="btn plain" id="vmb">Show more videos</button>' : '';
+    $('#vg').insertAdjacentHTML('beforeend', d.items.map(v => vcard(v)).join('') || (off ? '' : `<div class="empty" style="grid-column:1/-1">${I18n.t("videos.empty")}</div>`));
+    $('#vmore').innerHTML = d.more ? `<button class="btn plain" id="vmb">${I18n.t("videos.more")}</button>` : '';
     if (d.more) $('#vmb').onclick = async () => { off += 48; add(await api(`/api/videos/${row}?q=${encodeURIComponent(qq)}&len=${len}&sort=${sort}&offset=${off}`)) };
   };
   add(first);
@@ -602,35 +602,35 @@ async function watch(id, t, from) {
   const d = await api('/api/doc/' + encodeURIComponent(id));
   setTitle(d.title);
   const selfHref = `#/watch/${encodeURIComponent(id)}`;
-  remember({ key: 'v:' + id, title: d.title, href: selfHref, sub: 'Video · ' + fmtDur(d.duration) });
+  remember({ key: 'v:' + id, title: d.title, href: selfHref, sub: I18n.t("app.watch.video") + " " + fmtDur(d.duration) });
   const p = vprog()[id];
   const resumeAt = !t && p && p.t > 15 && (!d.duration || p.t < d.duration - 20) ? p.t : 0;
-  main.innerHTML = `<div class="rtop">${backButton(from, 'Videos')}</div>
+  main.innerHTML = `<div class="rtop">${backButton(from, I18n.t("nav.videos"))}</div>
   <div class="watch">
     <div>
       <div class="player"><video id="vid" controls preload="metadata" playsinline src="${fileUrl(d.path)}${t ? '#t=' + t : ''}"></video></div>
-      ${d.remote ? `<p class="small muted" style="margin:6px 0 0">Stored on the remote drive “${esc(d.remote)}”. It plays only while that computer is reachable.</p>` : ''}
+      ${d.remote ? `<p class="small muted" style="margin:6px 0 0">${I18n.t("app.watch.stored_on_the_remote_drive")}${esc(d.remote)}${I18n.t("app.watch.it_plays_only_while_that_computer")}</p>` : ''}
       <h1 class="vtitle">${esc(d.title)}</h1>
-      <div class="vmeta"><b>${esc(d.publisher || '')}</b><span>${fmtDur(d.duration)}</span>${d.upload_date ? `<span>${esc(d.upload_date.replace(/(\d{4})(\d\d)(\d\d)/, '$1-$2-$3'))}</span>` : ''}<span>${esc(d.trust)}</span></div>
-      ${resumeAt ? `<div class="resume" id="resume">You stopped at ${clock(resumeAt)}. <button class="btn" id="resYes">Resume</button><button class="btn plain" id="resNo">Start over</button></div>` : ''}
-      <div class="vactions dock">${saveButton({ key: 'v:' + id, title: d.title, href: selfHref, sub: 'Video · ' + fmtDur(d.duration) })}<a class="btn plain" title="Ask about this video" href="#/ask?about=${encodeURIComponent('video:' + id)}&${fromQ()}" id="askv">${ico('ask')}<span>Ask about this video</span></a></div>
-      <div class="notice small">A video shows how one person did something. Watching isn’t practice, and it may not match current safety guidance — check a manual for anything risky.</div>
+      <div class="vmeta"><b>${esc(d.publisher || '')}</b><span>${fmtDur(d.duration)}</span>${d.upload_date ? `<span>${esc(I18n.date(d.upload_date.replace(/(\d{4})(\d\d)(\d\d)/, '$1-$2-$3')))}</span>` : ''}<span>${esc(I18n.label(d.trust))}</span></div>
+      ${resumeAt ? `<div class="resume" id="resume">${I18n.t("app.watch.you_stopped_at")} ${clock(resumeAt)}. <button class="btn" id="resYes">${I18n.t("videos.player.resume")}</button><button class="btn plain" id="resNo">${I18n.t("videos.player.restart")}</button></div>` : ''}
+      <div class="vactions dock">${saveButton({ key: 'v:' + id, title: d.title, href: selfHref, sub: I18n.t("app.watch.video") + " " + fmtDur(d.duration) })}<a class="btn plain" title="${I18n.t("videos.player.ask")}" href="#/ask?about=${encodeURIComponent('video:' + id)}&${fromQ()}" id="askv">${ico('ask')}<span>${I18n.t("videos.player.ask")}</span></a></div>
+      <div class="notice small">${I18n.t("app.watch.a_video_shows_how_one_person")}</div>
     </div>
-    <section class="txpanel" id="tx" aria-label="Transcript"><header><h2>Transcript</h2><label class="sr" for="cueQ">Find in transcript</label><input id="cueQ" type="search" placeholder="Find words in the transcript"></header>
-      <div class="cues" id="cues"><p class="muted" style="padding:12px 14px">Loading transcript…</p></div><div class="txnote" id="txnote"></div></section>
+    <section class="txpanel" id="tx" aria-label="${I18n.t("videos.transcript.title")}"><header><h2>${I18n.t("videos.transcript.title")}</h2><label class="sr" for="cueQ">${I18n.t("app.watch.find_in_transcript")}</label><input id="cueQ" type="search" placeholder="${I18n.t("app.watch.find_words_in_the_transcript")}"></header>
+      <div class="cues" id="cues"><p class="muted" style="padding:12px 14px">${I18n.t("app.watch.loading_transcript")}</p></div><div class="txnote" id="txnote"></div></section>
   </div>
   <div id="morev"></div>
-  <details class="about-src"><summary>About this video</summary><div class="in"><dl><dt>Channel</dt><dd>${esc(d.publisher || '—')}</dd><dt>Kind</dt><dd>${esc(d.trust)}</dd><dt>Length</dt><dd>${fmtDur(d.duration) || 'unknown'}</dd>${d.notes ? `<dt>Note</dt><dd>${esc(d.notes)}</dd>` : ''}${d.source_url ? `<dt>Online original</dt><dd>${esc(hostOf(d.source_url))} <span class="muted">(online; not needed here)</span></dd>` : ''}</dl></div></details>`;
+  <details class="about-src"><summary>${I18n.t("videos.details.title")}</summary><div class="in"><dl><dt>${I18n.t("app.watch.channel")}</dt><dd>${esc(d.publisher || '—')}</dd><dt>${I18n.t("common.kind")}</dt><dd>${esc(I18n.label(d.trust))}</dd><dt>${I18n.t("common.length")}</dt><dd>${fmtDur(d.duration) || I18n.t('videos.duration.unknown')}</dd>${d.notes ? `<dt>${I18n.t("common.note")}</dt><dd>${esc(d.notes)}</dd>` : ''}${d.source_url ? `<dt>${I18n.t("app.watch.online_original")}</dt><dd>${esc(hostOf(d.source_url))} <span class="muted">${I18n.t("common.online_not_needed_here")}</span></dd>` : ''}</dl></div></details>`;
   const vid = $('#vid');
   if (d.thumb) vid.poster = fileUrl(d.thumb);
   vid.addEventListener('error', async () => {
     const say = why => vid.closest('.player')?.insertAdjacentHTML('afterend', `<div class="err">${why}</div>`);
-    if (d.remote) return say(`This video is on the remote drive “${esc(d.remote)}”, which isn’t reachable right now. The transcript below still works.`);
+    if (d.remote) return say(`${I18n.t("app.watch.this_video_is_on_the_remote")}${esc(d.remote)}${I18n.t("app.watch.which_isn_t_reachable_right_now")}`);
     // Say why when the reason is the format: some library videos are AV1, which a computer without an AV1 decoder (a Mac before the M3) can't play.
     const f = (await videoFormats(fileUrl(d.path)).catch(() => [])).map(x => UNPLAYABLE[x]).find(x => x && !vid.canPlayType(x[1]));
     if (!vid.isConnected) return;   // the person has gone to another page
-    say(f ? `This video is saved in the ${f[0]} format, which this computer can’t play in Lastbook. Try another video player that supports ${f[0]}, such as VLC: the file is in your Lastbook data folder, at <b style="overflow-wrap:anywhere">library-data/${esc(d.path)}</b>.`
-      : `This video file couldn’t be played here. <a href="${fileUrl(d.path)}" target="_blank" rel="noopener">Open the file directly</a>.`);
+    say(f ? `${I18n.t("app.watch.this_video_is_saved_in_the")} ${f[0]} ${I18n.t("app.watch.format_which_this_computer_can_t")} ${f[0]}${I18n.t("app.watch.such_as_vlc_the_file_is")} <b style="overflow-wrap:anywhere">library-data/${esc(d.path)}</b>.`
+      : `${I18n.t("app.watch.this_video_file_couldn_t_be")} <a href="${fileUrl(d.path)}" target="_blank" rel="noopener">${I18n.t("app.watch.open_the_file_directly")}</a>.`);
   }, { once: true });
   if (resumeAt) {
     $('#resYes').onclick = () => { vid.currentTime = resumeAt; vid.play().catch(() => { }); $('#resume').remove() };
@@ -646,14 +646,14 @@ async function watch(id, t, from) {
   let cues = [];
   try {
     const tx = await api('/api/transcript/' + encodeURIComponent(id)); cues = tx.cues || [];
-    $('#txnote').textContent = cues.length ? `${tx.source === 'authored' ? 'Captions written by the publisher' : /auto/.test(tx.source || '') ? 'Automatic captions' : 'Captions'} — may contain errors.` : '';
+    $('#txnote').textContent = cues.length ? `${tx.source === 'authored' ? I18n.t("app.watch.captions_written_by_the_publisher") : /auto/.test(tx.source || '') ? I18n.t("app.watch.automatic_captions") : I18n.t("common.captions")} ${I18n.t("app.watch.may_contain_errors")}` : '';
   } catch { }
   const box = $('#cues');
   const draw = q => {
     const rx = q ? new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig') : null;
     const list = cues.filter(c => !rx || c.text.match(rx));
     box.innerHTML = list.length ? list.map(c => `<button class="cue" data-t="${c.t ?? ''}"><time>${c.t != null ? clock(c.t) : ''}</time><span>${rx ? esc(c.text).replace(rx, m => `<mark>${m}</mark>`) : esc(c.text)}</span></button>`).join('')
-      : `<p class="muted" style="padding:12px 14px">${cues.length ? 'No matching words.' : 'No transcript was saved for this video, so search and the assistant can’t see what’s said in it.'}</p>`;
+      : `<p class="muted" style="padding:12px 14px">${cues.length ? I18n.t("app.draw.no_matching_words") : I18n.t("app.draw.no_transcript_was_saved_for_this")}</p>`;
   };
   draw('');
   $('#cueQ').addEventListener('input', e => draw(e.target.value.trim()));
@@ -666,7 +666,7 @@ async function watch(id, t, from) {
   });
   try {
     const rel = await api('/api/videos/related/' + encodeURIComponent(id));
-    if (rel.length && $('#morev')) { $('#morev').innerHTML = secHead('More like this') + rail(rel.map(v => vcard(v)).join('')); wireRails($('#morev')) }
+    if (rel.length && $('#morev')) { $('#morev').innerHTML = secHead(I18n.t("app.watch.more_like_this")) + rail(rel.map(v => vcard(v)).join('')); wireRails($('#morev')) }
   } catch { }
 }
 
@@ -682,59 +682,59 @@ async function reader(id, page, from, view) {
   view = isPdf ? view || 'page' : isWeb ? view || 'web' : 'text';
   const key = 'd:' + id + (isPdf ? ':' + page : '');
   const selfHref = `#/read/${encodeURIComponent(id)}?p=${page}`;
-  remember({ key: 'd:' + id, title: d.title, href: selfHref, sub: (isPdf ? 'Page ' + page + ' · ' : '') + (d.publisher || '') });
+  remember({ key: 'd:' + id, title: d.title, href: selfHref, sub: (isPdf ? I18n.t("common.page") + " " + page + ' · ' : '') + (d.publisher || '') });
   const go = (p, v = view) => `#/read/${encodeURIComponent(id)}?p=${p}&view=${v}${from ? '&from=' + encodeURIComponent(from) : ''}`;
-  const views = isPdf ? [['page', 'Page'], ['text', 'Text'], ['pdf', 'Whole PDF']] : isWeb ? [['web', 'Page'], ['text', 'Text only']] : [];
+  const views = isPdf ? [['page', I18n.t("common.page")], ['text', I18n.t("common.text")], ['pdf', I18n.t("app.views.whole_pdf")]] : isWeb ? [['web', I18n.t("common.page")], ['text', I18n.t("app.views.text_only")]] : [];
   main.innerHTML = `
     <div class="rtop">${backButton(from)}</div>
     <h1 class="rtitle">${esc(d.title)}</h1>
-    <div class="rsrc"><b>${esc(d.publisher || '')}</b>${d.year ? ' · ' + esc(d.year) : ''} · ${esc(d.trust)}</div>
-    <div class="rmodes">${views.length ? `<div class="seg dock" role="group" aria-label="How to show it">${views.map(([v, l]) => `<button data-view="${v}" aria-pressed="${v === view}">${l}</button>`).join('')}</div>` : ''}<span class="vactions dock">${askLink('doc:' + id + ':' + (isPdf ? page : 1), 'Ask')}${saveButton({ key, title: d.title + (isPdf ? ' — page ' + page : ''), href: selfHref, sub: d.publisher || d.kindLabel })}<button class="tb-btn insp-btn" data-insp aria-label="Show or hide the source details" title="Details">${ico('insp')}</button></span></div>
+    <div class="rsrc"><b>${esc(d.publisher || '')}</b>${d.year ? ' · ' + esc(d.year) : ''} · ${esc(I18n.label(d.trust))}</div>
+    <div class="rmodes">${views.length ? `<div class="seg dock" role="group" aria-label="${I18n.t("app.reader.how_to_show_it")}">${views.map(([v, l]) => `<button data-view="${v}" aria-pressed="${v === view}">${l}</button>`).join('')}</div>` : ''}<span class="vactions dock">${askLink('doc:' + id + ':' + (isPdf ? page : 1), I18n.t("common.ask"))}${saveButton({ key, title: d.title + (isPdf ? " " + I18n.t("app.reader.page") + " " + page : ''), href: selfHref, sub: d.publisher || d.kindLabel })}<button class="tb-btn insp-btn" data-insp aria-label="${I18n.t("app.reader.show_or_hide_the_source_details")}" title="${I18n.t("common.details")}">${ico('insp')}</button></span></div>
     <div id="docbody"></div>
-    ${d.imageOnly ? '<div class="notice">This is a scanned document without searchable text, so search and the assistant can’t read it. Use the Page view.</div>' : ''}
-    ${isPdf && view !== 'pdf' ? `<div class="rbar"><a class="btn plain nav" href="${go(page - 1)}" ${page <= 1 ? 'aria-disabled="true" style="opacity:.35;pointer-events:none"' : ''} aria-label="Previous page">${ico('back')}<span>Previous</span></a>
-      <span class="pnum"><label class="sr" for="pg">Page number</label>Page <input id="pg" inputmode="numeric" value="${page}"> of ${total}</span>
-      <a class="btn nav" href="${go(page + 1)}" ${page >= total ? 'aria-disabled="true" style="opacity:.35;pointer-events:none"' : ''} aria-label="Next page"><span>Next</span>${ico('right')}</a></div>` : ''}
-    <details class="about-src"><summary>About this source</summary><div class="in"><p class="insp-h">${esc(d.title)}</p>
-      <dl><dt>Publisher</dt><dd>${esc(d.publisher || '—')}</dd><dt>Kind</dt><dd>${esc(d.trust)} · ${esc(d.kindLabel)}</dd>
-      ${d.edition ? `<dt>Edition</dt><dd>${esc(d.edition)}</dd>` : ''}${d.year ? `<dt>Year</dt><dd>${esc(d.year)}</dd>` : ''}
-      <dt>Saved</dt><dd>${esc((d.retrieved_at || '').slice(0, 10) || 'unknown date')} · ${esc(d.collection)}</dd>
-      ${d.notes ? `<dt>Note</dt><dd>${esc(d.notes)}</dd>` : ''}
-      ${d.source_url ? `<dt>Online original</dt><dd>${esc(hostOf(d.source_url))} <span class="muted">(online; not needed to read this copy)</span></dd>` : ''}</dl>
-      <p class="small muted">A reference copy, not advice checked for your situation. Check the date; older material can conflict with current guidance.</p>
-      ${isPdf || isWeb || !IN_WINDOW ? `<p><a class="btn ghost" href="${fileUrl(d.path)}${isPdf ? '#page=' + page : ''}" target="_blank" rel="noopener">${ico('ext')}Open the original file</a></p>` : ''}</div></details>`;
+    ${d.imageOnly ? `<div class="notice">${I18n.t("app.reader.this_is_a_scanned_document_without")}</div>` : ''}
+    ${isPdf && view !== 'pdf' ? `<div class="rbar"><a class="btn plain nav" href="${go(page - 1)}" ${page <= 1 ? 'aria-disabled="true" style="opacity:.35;pointer-events:none"' : ''} aria-label="${I18n.t("app.reader.previous_page")}">${ico('back')}<span>${I18n.t("common.previous")}</span></a>
+      <span class="pnum"><label class="sr" for="pg">${I18n.t("app.reader.page_number")}</label>${I18n.t("common.page")} <input id="pg" inputmode="numeric" value="${page}"> ${I18n.t("common.of_word")} ${total}</span>
+      <a class="btn nav" href="${go(page + 1)}" ${page >= total ? 'aria-disabled="true" style="opacity:.35;pointer-events:none"' : ''} aria-label="${I18n.t("app.reader.next_page")}"><span>${I18n.t("common.next")}</span>${ico('right')}</a></div>` : ''}
+    <details class="about-src"><summary>${I18n.t("app.reader.about_this_source")}</summary><div class="in"><p class="insp-h">${esc(d.title)}</p>
+      <dl><dt>${I18n.t("common.publisher")}</dt><dd>${esc(d.publisher || '—')}</dd><dt>${I18n.t("common.kind")}</dt><dd>${esc(I18n.label(d.trust))} · ${esc(I18n.label(d.kindLabel))}</dd>
+      ${d.edition ? `<dt>${I18n.t("common.edition")}</dt><dd>${esc(d.edition)}</dd>` : ''}${d.year ? `<dt>${I18n.t("common.year")}</dt><dd>${esc(d.year)}</dd>` : ''}
+      <dt>${I18n.t("common.saved")}</dt><dd>${esc(I18n.date((d.retrieved_at || '').slice(0, 10)) || I18n.t("app.reader.unknown_date"))} · ${esc(d.collection)}</dd>
+      ${d.notes ? `<dt>${I18n.t("common.note")}</dt><dd>${esc(d.notes)}</dd>` : ''}
+      ${d.source_url ? `<dt>${I18n.t("app.watch.online_original")}</dt><dd>${esc(hostOf(d.source_url))} <span class="muted">${I18n.t("common.online_not_needed_to_read_this_copy")}</span></dd>` : ''}</dl>
+      <p class="small muted">${I18n.t("app.reader.a_reference_copy_not_advice_checked")}</p>
+      ${isPdf || isWeb || !IN_WINDOW ? `<p><a class="btn ghost" href="${fileUrl(d.path)}${isPdf ? '#page=' + page : ''}" target="_blank" rel="noopener">${ico('ext')}${I18n.t("app.reader.open_the_original_file")}</a></p>` : ''}</div></details>`;
   $$('[data-view]', main).forEach(b => b.addEventListener('click', () => swap(go(page, b.dataset.view))));
   if (innerWidth >= 1060 && !html.classList.contains('insp-off')) $('.about-src', main).open = true;
   const pg = $('#pg'); if (pg) pg.addEventListener('change', () => { const n = parseInt(pg.value, 10); if (n >= 1 && n <= total) location.hash = go(n) });
   const body = $('#docbody');
   if (view === 'page') {
     const w = Math.min(1600, Math.round(Math.min(innerWidth, 1000) * Math.min(2, devicePixelRatio || 1)));
-    body.innerHTML = `<div class="pagewrap"><img class="pageimg" alt="Page ${page} of ${esc(d.title)}" src="${pageImg(id, page, w)}"></div>`;
+    body.innerHTML = `<div class="pagewrap"><img class="pageimg" alt="${I18n.t("common.page")} ${page} ${I18n.t("common.of_word")} ${esc(d.title)}" src="${pageImg(id, page, w)}"></div>`;
     const img = $('img', body);
-    img.addEventListener('error', () => { body.innerHTML = `<div class="notice">This page image couldn’t be made. <a href="${go(page, 'text')}">Show the text instead</a>.</div>` });
+    img.addEventListener('error', () => { body.innerHTML = `<div class="notice">${I18n.t("app.reader.this_page_image_couldn_t_be")} <a href="${go(page, 'text')}">${I18n.t("app.reader.show_the_text_instead")}</a>.</div>` });
     if (page < total) { const n = new Image(); n.src = pageImg(id, page + 1, w) }
     let sx = null, sy = 0;
     const wrap = $('.pagewrap', body);
     wrap.addEventListener('touchstart', e => { if (e.touches.length === 1) { sx = e.touches[0].clientX; sy = e.touches[0].clientY } }, { passive: true });
     wrap.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx < 0 && page < total) location.hash = go(page + 1); if (dx > 0 && page > 1) location.hash = go(page - 1) } }, { passive: true });
   } else if (view === 'pdf') {
-    body.innerHTML = `<iframe class="frame" title="${esc(d.title)}" src="${fileUrl(d.path)}#page=${page}"></iframe><p class="small muted">If the PDF doesn’t show here (some phones can’t), use Page view or open the original file.</p>`;
+    body.innerHTML = `<iframe class="frame" title="${esc(d.title)}" src="${fileUrl(d.path)}#page=${page}"></iframe><p class="small muted">${I18n.t("app.reader.if_the_pdf_doesn_t_show")}</p>`;
   } else if (view === 'web') {
     const own = /(^|\/)documents\/lastbook\//.test(d.path);   // Lastbook's own pages (Sources and permissions) take the window's look from the server (engine/saved_pages.py, OWN_LOOK); an older server's stays a white sheet
     body.innerHTML = `<iframe class="frame${own ? ' own' : ''}" title="${esc(d.title)}" src="${fileUrl(d.path)}"></iframe>`;
   } else {
-    body.innerHTML = '<p class="loading">Loading text…</p>';
+    body.innerHTML = `<p class="loading">${I18n.t("app.reader.loading_text")}</p>`;
     try {
       const t = await api(`/api/page/${encodeURIComponent(id)}/${isPdf ? page : 1}`);
       const txt = (t.text || '').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
-      body.innerHTML = `${isPdf || isWeb ? '<div class="notice small">Text pulled out of the original automatically — tables, diagrams and warning boxes can be lost or out of order. Check the Page view for anything important.</div>' : ''}<div class="pagetext">${esc(txt) || '<span class="muted">No text on this page (it may be a picture or blank).</span>'}</div>`;
-    } catch (e) { body.innerHTML = errorBox(e, 'Couldn’t load the text.') }
+      body.innerHTML = `${isPdf || isWeb ? `<div class="notice small">${I18n.t("app.reader.text_pulled_out_of_the_original")}</div>` : ''}<div class="pagetext">${esc(txt) || `<span class="muted">${I18n.t("app.reader.no_text_on_this_page_it")}</span>`}</div>`;
+    } catch (e) { body.innerHTML = errorBox(e, I18n.t("app.reader.couldn_t_load_the_text")) }
   }
   main.onkeydown = e => { if (!isPdf || /INPUT/.test(e.target.tagName) || e.altKey || e.metaKey || e.ctrlKey) return; if (e.key === 'ArrowRight' && page < total) location.hash = go(page + 1); if (e.key === 'ArrowLeft' && page > 1) location.hash = go(page - 1) };
 }
 
 /* --------------------------------------------------------------- wiki -- */
-const ZIMNAMES = { mdwiki: 'Medical encyclopedia (MDWiki)', wikipedia: 'Wikipedia (text only)', wikibooks: 'Wikibooks — how-to textbooks', appropedia: 'Appropedia — appropriate technology' };
+const ZIMNAMES = { mdwiki: I18n.t("app.zimnames.medical_encyclopedia_mdwiki"), wikipedia: I18n.t("app.zimnames.wikipedia_text_only"), wikibooks: I18n.t("app.zimnames.wikibooks_how_to_textbooks"), appropedia: I18n.t("app.zimnames.appropedia_appropriate_technology") };
 const zimLabel = name => { for (const k in ZIMNAMES) if (name.startsWith(k)) return ZIMNAMES[k]; return name };
 async function wiki(path, from, y) {
   const [zim, ...rest] = path.split('/');
@@ -745,7 +745,7 @@ async function wiki(path, from, y) {
   const selfHref = '#/wiki/' + path;
   const mainPage = zimMain(zim);
   main.innerHTML = `<div class="rtop">${backButton(from || '#/encyclopedias')}<span id="wsave" class="dock">${saveButton({ key: 'w:' + path, title, href: selfHref, sub: zimLabel(zim) })}</span></div>
-    <h1 class="rtitle" id="wtitle">${esc(title)}</h1><div class="rsrc"><span class="zn">${esc(zimLabel(zim))} · </span>Community-written; check safety-critical steps against a manual${IN_WINDOW ? '' : ` · <a id="wopen" href="${src}" target="_blank" rel="noopener">open on its own</a>`}</div>
+    <h1 class="rtitle" id="wtitle">${esc(title)}</h1><div class="rsrc"><span class="zn">${esc(zimLabel(zim))} · </span>${I18n.t("app.wiki.community_written_check_safety_critical_steps")}${IN_WINDOW ? '' : ` · <a id="wopen" href="${src}" target="_blank" rel="noopener">${I18n.t("app.wiki.open_on_its_own")}</a>`}</div>
     <iframe class="frame" id="wframe" title="${esc(title)}" src="${src}"></iframe>`;
   const f = $('#wframe');
   // The toolbar names the encyclopedia, and the article once the article's own title has scrolled up out of the frame, as a large title does
@@ -791,7 +791,7 @@ async function wiki(path, from, y) {
       if (f.contentDocument !== fd) return;
       if (front && own) own.style.setProperty('display', 'none', 'important');   // the skin sets its own display, which the hidden attribute does not beat
       main.classList.toggle('own-title', front);   // then the app's heading names it
-      const nt = front ? zimLabel(zim) : raw || p.split('/').pop().replace(/_/g, ' '), sub = front ? 'Encyclopedia' : zimLabel(zim);
+      const nt = front ? zimLabel(zim) : raw || p.split('/').pop().replace(/_/g, ' '), sub = front ? I18n.t("app.rowsub.encyclopedia") : zimLabel(zim);
       $('#wtitle').textContent = nt; if ($('#wopen')) $('#wopen').href = loc; setTitle(nt, '', zimLabel(zim));
       f.lbName = !front && own ? { nt, at: own.getBoundingClientRect().bottom + fw.scrollY } : null; barName();
       $('#wsave').innerHTML = saveButton({ key: 'w:' + p, title: nt, href: '#/wiki/' + p, sub });
@@ -893,32 +893,32 @@ function lookOf(fd) {
   r.setProperty('--lb-link', getComputedStyle(probe).color); probe.remove();
   for (const [k, v] of [['--lb-ink', '--ink'], ['--lb-ink2', '--ink2'], ['--lb-line', '--line2'], ['--lb-font', '--font'], ['--lb-display', '--display']]) { const x = cs.getPropertyValue(v).trim(); if (x) r.setProperty(k, x) }
 }
-const ZIMS = [['mdwiki_en_all_maxi_2025-11.zim', 'Medical encyclopedia', 'MDWiki: plain-language articles on conditions, medicines and first aid.', 'health'],
-['wikibooks_en_all_maxi_2026-04.zim', 'Wikibooks', 'Open textbooks and how-to manuals, from cooking to electronics.', 'book'],
-['appropedia_en_all_maxi_2026-02.zim', 'Appropedia', 'Appropriate technology: water, sanitation, energy and building projects.', 'repair'],
-['wikipedia_en_all_nopic_2026-06.zim', 'Wikipedia', 'The full English encyclopedia, text only (no pictures).', 'wiki']];
+const ZIMS = [['mdwiki_en_all_maxi_2025-11.zim', I18n.t("app.zims.medical_encyclopedia"), I18n.t("app.zims.mdwiki_plain_language_articles_on_conditions"), 'health'],
+['wikibooks_en_all_maxi_2026-04.zim', 'Wikibooks', I18n.t("app.zims.open_textbooks_and_how_to_manuals"), 'book'],
+['appropedia_en_all_maxi_2026-02.zim', 'Appropedia', I18n.t("app.zims.appropriate_technology_water_sanitation_energy_and"), 'repair'],
+['wikipedia_en_all_nopic_2026-06.zim', 'Wikipedia', I18n.t("app.zims.the_full_english_encyclopedia_text_only"), 'wiki']];
 const zimsHere = async () => { const here = (await libInfo()).zims; return here ? ZIMS.filter(z => here.includes(z[0])) : ZIMS };
 async function encyclopedias(q) {
-  setTitle('Encyclopedias');
+  setTitle(I18n.t("common.encyclopedias"));
   const zims = await zimsHere();
-  if (!zims.length) { main.innerHTML = `<h1>Encyclopedias</h1><p class="lead">This download has no encyclopedias.</p>`; return }
-  main.innerHTML = `<h1>Encyclopedias</h1><p class="lead">${['', 'One complete encyclopedia', 'Two complete encyclopedias', 'Three complete encyclopedias', 'Four complete encyclopedias'][zims.length]}. Community-written: good for background — use the guides’ manuals for safety-critical steps.</p>
-  <div style="margin:16px 0">${searchBox('zq', q, 'e.g. tetanus, solar panel, sourdough')}</div><div id="zres"></div>
-  ${secHead('Open one')}<div class="cards2">${zims.map(z => `<a class="card" href="#/wiki/${z[0]}/?from=${encodeURIComponent('#/encyclopedias')}"><span class="ico">${ico(z[3])}</span><b>${esc(z[1])}</b><small>${esc(z[2])}</small></a>`).join('')}</div>`;
+  if (!zims.length) { main.innerHTML = `<h1>${I18n.t("common.encyclopedias")}</h1><p class="lead">${I18n.t("app.encyclopedias.this_download_has_no_encyclopedias")}</p>`; return }
+  main.innerHTML = `<h1>${I18n.t("common.encyclopedias")}</h1><p class="lead">${['', I18n.t("app.encyclopedias.one_complete_encyclopedia"), I18n.t("app.encyclopedias.two_complete_encyclopedias"), I18n.t("app.encyclopedias.three_complete_encyclopedias"), I18n.t("app.encyclopedias.four_complete_encyclopedias")][zims.length]}. Community-written: good for background — use the guides’ manuals for safety-critical steps.</p>
+  <div style="margin:16px 0">${searchBox('zq', q, I18n.t("app.encyclopedias.e_g_tetanus_solar_panel_sourdough"))}</div><div id="zres"></div>
+  ${secHead(I18n.t("app.encyclopedias.open_one"))}<div class="cards2">${zims.map(z => `<a class="card" href="#/wiki/${z[0]}/?from=${encodeURIComponent('#/encyclopedias')}"><span class="ico">${ico(z[3])}</span><b>${esc(z[1])}</b><small>${esc(z[2])}</small></a>`).join('')}</div>`;
   $('#zqF').addEventListener('submit', e => { e.preventDefault(); location.hash = '#/encyclopedias?q=' + encodeURIComponent($('#zq').value.trim()) });
   if (q) zimResults(q, $('#zres'), 40);
 }
 // heading: part of a wider search, shown under that heading only when something matched. Answers whether anything did.
 async function zimResults(q, el, max = 8, heading = '') {
-  el.innerHTML = heading ? '' : '<p class="loading">Searching the encyclopedias…</p>';
+  el.innerHTML = heading ? '' : `<p class="loading">${I18n.t("app.zimresults.searching_the_encyclopedias")}</p>`;
   try {
     const hits = await api('/api/collection-search?q=' + encodeURIComponent(q));
-    if (!hits.length) { el.innerHTML = heading ? '' : `<div class="empty"><span class="e-ico">${ico('wiki')}</span><b>No articles found</b><p>Try another word for the same thing.</p></div>`; return false }
+    if (!hits.length) { el.innerHTML = heading ? '' : `<div class="empty"><span class="e-ico">${ico('wiki')}</span><b>${I18n.t("app.zimresults.no_articles_found")}</b><p>${I18n.t("app.zimresults.try_another_word_for_the_same")}</p></div>`; return false }
     const ord = ['mdwiki', 'wikibooks', 'appropedia', 'wikipedia'];
     hits.sort((a, b) => ord.findIndex(k => a.collection.startsWith(k)) - ord.findIndex(k => b.collection.startsWith(k)));
     el.innerHTML = `${heading ? `<h2>${heading}</h2>` : ''}<ul class="list">${hits.slice(0, max).map(h => `<li><a class="row" href="#/wiki/${esc(h.path.replace(/^zim\//, ''))}?${fromQ()}"><span class="k">${ico('wiki')}</span><span><b>${esc(h.title)}</b><small>${esc(zimLabel(h.collection))}</small></span></a></li>`).join('')}</ul>`;
     return true;
-  } catch (e) { el.innerHTML = heading ? '' : `<p class="muted">Encyclopedia search isn’t available right now (${esc(e.message)}).</p>`; return false }
+  } catch (e) { el.innerHTML = heading ? '' : `<p class="muted">${I18n.t("app.zimresults.encyclopedia_search_isn_t_available_right")}${esc(e.message)}).</p>`; return false }
 }
 
 /* ------------------------------------------------------------- search -- */
@@ -929,11 +929,11 @@ function topicMatches(q) {
 }
 let searchSeq = 0;
 async function searchPage(q, kind) {
-  setTitle(q ? 'Search: ' + q : 'Search');
-  const kinds = [['all', 'Everything'], ['read', 'Manuals & pages'], ['video', 'Videos'], ['wiki', 'Encyclopedias']];
-  main.innerHTML = `<h1>${q ? 'Results' : 'Search'}</h1>
-  ${searchBox('searchQ', q, 'Describe it in everyday words')}
-  <div class="chips" role="group" aria-label="Show" style="margin-top:12px" id="kinds">${kinds.map(([k, l]) => `<a class="chip ${k === kind ? 'on' : ''}" aria-pressed="${k === kind}" data-kind="${k}" href="#/search?q=${encodeURIComponent(q)}&kind=${k}">${l}</a>`).join('')}</div>
+  setTitle(q ? I18n.t("app.searchpage.search") + " " + q : I18n.t("common.search"));
+  const kinds = [['all', I18n.t("common.everything")], ['read', I18n.t("app.kinds.manuals_pages")], ['video', I18n.t("nav.videos")], ['wiki', I18n.t("common.encyclopedias")]];
+  main.innerHTML = `<h1>${q ? I18n.t("common.results") : I18n.t("common.search")}</h1>
+  ${searchBox('searchQ', q, I18n.t("app.searchpage.describe_it_in_everyday_words"))}
+  <div class="chips" role="group" aria-label="${I18n.t("common.show")}" style="margin-top:12px" id="kinds">${kinds.map(([k, l]) => `<a class="chip ${k === kind ? 'on' : ''}" aria-pressed="${k === kind}" data-kind="${k}" href="#/search?q=${encodeURIComponent(q)}&kind=${k}">${l}</a>`).join('')}</div>
   <div id="sask"></div><div id="sout"></div>`;
   const input = $('#searchQ');
   $('#searchQF').addEventListener('submit', e => { e.preventDefault(); input.blur(); go(input.value.trim(), true) });
@@ -956,38 +956,38 @@ async function searchPage(q, kind) {
 }
 function askOffer(q) {
   const el = $('#sask'); if (!el) return;
-  el.innerHTML = q && q.split(/\s+/).length >= 2 ? `<a class="ghit" href="#/ask?q=${encodeURIComponent(q)}" style="--tc:var(--accent)"><span class="ico">${ico('ask')}</span><span><b>Ask the library: “${esc(q)}”</b><small>Get a written answer with the exact pages it came from</small></span></a>` : '';
+  el.innerHTML = q && q.split(/\s+/).length >= 2 ? `<a class="ghit" href="#/ask?q=${encodeURIComponent(q)}" style="--tc:var(--accent)"><span class="ico">${ico('ask')}</span><span><b>${I18n.t("app.askoffer.ask_the_library")}${esc(q)}”</b><small>${I18n.t("app.askoffer.get_a_written_answer_with_the")}</small></span></a>` : '';
 }
 async function results(q, kind) {
   const seq = ++searchSeq, out = $('#sout');
   if (!q) {
-    out.innerHTML = `<p class="muted" style="margin-top:18px">Use the words you’d use with a friend. For example:</p><div class="chips wrapchips">${['clean drinking water', 'broken leg', 'carbon monoxide', 'keep food cold', 'ham radio license', 'plant potatoes', 'sharpen a knife', 'diarrhea in a child'].map(x => `<a class="chip" href="#/search?q=${encodeURIComponent(x)}">${esc(x)}</a>`).join('')}</div>`;
+    out.innerHTML = `<p class="muted" style="margin-top:18px">${I18n.t("app.results.use_the_words_you_d_use")}</p><div class="chips wrapchips">${[I18n.t("app.results.clean_drinking_water"), I18n.t("app.results.broken_leg"), I18n.t("app.results.carbon_monoxide"), I18n.t("app.results.keep_food_cold"), I18n.t("app.results.ham_radio_license"), I18n.t("app.results.plant_potatoes"), I18n.t("app.results.sharpen_a_knife"), I18n.t("app.results.diarrhea_in_a_child")].map(x => `<a class="chip" href="#/search?q=${encodeURIComponent(x)}">${esc(x)}</a>`).join('')}</div>`;
     return;
   }
   const g = kind === 'all' ? topicMatches(q) : [];
-  out.innerHTML = `${g.length ? `<h2>Start with a guide</h2>${g.map(({ t, c }) => `<a class="ghit" href="#/t/${t.id}${c ? '/' + c.id : ''}" ${tcStyle(t.id)}><span class="ico">${ico(t.id)}</span><span><b>${esc(SHORT[t.id] || t.title)}${c ? ' — ' + esc(c.label) : ''}</b><small>Picked pages with exact page numbers and safety limits</small></span></a>`).join('')}` : ''}
+  out.innerHTML = `${g.length ? `<h2>${I18n.t("app.results.start_with_a_guide")}</h2>${g.map(({ t, c }) => `<a class="ghit" href="#/t/${t.id}${c ? '/' + c.id : ''}" ${tcStyle(t.id)}><span class="ico">${ico(t.id)}</span><span><b>${esc(SHORT[t.id] || t.title)}${c ? ' — ' + esc(c.label) : ''}</b><small>${I18n.t("app.results.picked_pages_with_exact_page_numbers")}</small></span></a>`).join('')}` : ''}
     <div id="spass"></div><div id="svid"></div><div id="sres"></div><div id="szim"></div>`;
   if (kind === 'wiki') return zimResults(q, $('#szim'), 40);
   // Each part answers whether it found anything; "nothing matched" shows once, only when none did.
   const parts = kind === 'all' || kind === 'read' ? [passages(q, seq)] : [];
   const reqs = [api('/api/find?q=' + encodeURIComponent(q) + '&kind=' + (kind === 'video' ? 'video' : 'read'))];
   if (kind === 'all') reqs.push(api('/api/find?q=' + encodeURIComponent(q) + '&kind=video').catch(() => null));
-  $('#sres').innerHTML = '<p class="loading">Searching…</p>';
+  $('#sres').innerHTML = `<p class="loading">${I18n.t("app.results.searching")}</p>`;
   const found = (async () => {
     try {
       const [d, vd] = await Promise.all(reqs);
       if (seq !== searchSeq) return true;
       const vids = (kind === 'video' ? d : vd)?.results || [];
       if (kind === 'video') { $('#sres').innerHTML = vids.length ? `<div class="vgrid" style="margin-top:14px">${vids.map(r => vcard(r)).join('')}</div>` : ''; return vids.length > 0 }
-      if (vids.length) { $('#svid').innerHTML = secHead('Videos', '', `<a href="#/search?q=${encodeURIComponent(q)}&kind=video">See all</a>`) + rail(vids.slice(0, 10).map(r => vcard(r)).join('')); wireRails($('#svid')) }
-      $('#sres').innerHTML = d.results.length ? `<h2>In the manuals and saved pages</h2>
-        ${d.expanded.length ? `<p class="small muted">Also looked for: ${d.expanded.slice(0, 10).map(esc).join(', ')}${d.mode === 'some words' ? ' · showing pages with some of your words' : ''}</p>` : ''}
+      if (vids.length) { $('#svid').innerHTML = secHead(I18n.t("nav.videos"), '', `<a href="#/search?q=${encodeURIComponent(q)}&kind=video">${I18n.t("app.videoshome.see_all")}</a>`) + rail(vids.slice(0, 10).map(r => vcard(r)).join('')); wireRails($('#svid')) }
+      $('#sres').innerHTML = d.results.length ? `<h2>${I18n.t("app.found.in_the_manuals_and_saved_pages")}</h2>
+        ${d.expanded.length ? `<p class="small muted">${I18n.t("app.found.also_looked_for")} ${d.expanded.slice(0, 10).map(esc).join(', ')}${d.mode === I18n.t("app.found.some_words") ? " " + I18n.t("app.found.showing_pages_with_some_of_your") : ''}</p>` : ''}
         <div class="results">${d.results.map(resultCard).join('')}</div>` : '';
       return d.results.length + vids.length > 0;
-    } catch (e) { if (seq === searchSeq) $('#sres').innerHTML = errorBox(e, 'Search isn’t responding.') + '<p class="small muted">The library may be busy rebuilding its index. Try again in a minute.</p>'; return true }
+    } catch (e) { if (seq === searchSeq) $('#sres').innerHTML = errorBox(e, I18n.t("app.found.search_isn_t_responding")) + `<p class="small muted">${I18n.t("app.found.the_library_may_be_busy_rebuilding")}</p>`; return true }
   })();
   parts.push(found);
-  if (kind === 'all') parts.push(found.then(() => seq === searchSeq && zimResults(q, $('#szim'), 6, 'In the encyclopedias')));
+  if (kind === 'all') parts.push(found.then(() => seq === searchSeq && zimResults(q, $('#szim'), 6, I18n.t("app.results.in_the_encyclopedias"))));
   const any = (await Promise.all(parts)).some(Boolean);
   if (seq === searchSeq && !g.length && !any) $('#sres').innerHTML = emptySearch(q);
 }
@@ -996,74 +996,74 @@ async function passages(q, seq) {
   try {
     const d = await api('/api/retrieve?q=' + encodeURIComponent(q) + '&k=6&kind=manual');
     if (seq !== searchSeq || !d.results.length || !$('#spass')) return false;
-    $('#spass').innerHTML = secHead('Most relevant pages', d.semantic && !d.semantic.chunks ? 'Matched by your words' : 'Matched by meaning as well as by words') + `<div class="rcards">${d.results.map(r => rcard({ src: { id: r.doc_id, kind: r.kind, title: r.title, publisher: r.publisher, year: r.year, pages: r.pages, trust: r.trust }, page: r.page, label: r.title, note: (r.excerpt || '').slice(0, 220) + '…' })).join('')}</div>`;
+    $('#spass').innerHTML = secHead(I18n.t("app.passages.most_relevant_pages"), d.semantic && !d.semantic.chunks ? I18n.t("app.passages.matched_by_your_words") : I18n.t("app.passages.matched_by_meaning_as_well_as")) + `<div class="rcards">${d.results.map(r => rcard({ src: { id: r.doc_id, kind: r.kind, title: r.title, publisher: r.publisher, year: r.year, pages: r.pages, trust: r.trust }, page: r.page, label: r.title, note: (r.excerpt || '').slice(0, 220) + '…' })).join('')}</div>`;
     return true;
   } catch { return false }
 }
-const emptySearch = q => `<div class="empty"><span class="e-ico">${ico('search')}</span><b>No results for “${esc(q)}”</b><p>Try fewer words, or another word for the same thing.</p></div>`;
+const emptySearch = q => `<div class="empty"><span class="e-ico">${ico('search')}</span><b>${I18n.t("app.emptysearch.no_results_for")}${esc(q)}”</b><p>${I18n.t("app.emptysearch.try_fewer_words_or_another_word")}</p></div>`;
 function resultCard(r) {
   const base = { src: r };
   return `<article class="result"><h3><a href="${hrefFor({ ...base, page: r.hits[0] && r.hits[0].page })}">${esc(r.title)}</a></h3>
-    <div class="rsrc">${srcText(r)} · ${esc(r.trust)}</div>
-    ${r.hits.slice(0, 2).map(h => `<a class="hit" href="${hrefFor({ ...base, page: h.page })}">${h.page ? `<b>Page ${h.page}:</b> ` : ''}${h.snippet}</a>`).join('')}</article>`;
+    <div class="rsrc">${srcText(r)} · ${esc(I18n.label(r.trust))}</div>
+    ${r.hits.slice(0, 2).map(h => `<a class="hit" href="${hrefFor({ ...base, page: h.page })}">${h.page ? `<b>${I18n.t("common.page")} ${h.page}:</b> ` : ''}${h.snippet}</a>`).join('')}</article>`;
 }
 
 /* ------------------------------------------------------------ library -- */
 async function library() {
-  setTitle('Library');
+  setTitle(I18n.t("nav.library"));
   const saved = store.get('saved', []).length, chats = (window.Chat ? Chat.count() : 0);
   const zims = await zimsHere();
-  main.innerHTML = `<h1>Library</h1><p class="lead">Your saved things, learning routes, encyclopedias and every manual in the collection.</p>
+  main.innerHTML = `<h1>${I18n.t("nav.library")}</h1><p class="lead">${I18n.t("app.library.your_saved_things_learning_routes_encyclopedias")}</p>
   <div class="cards2 three" style="margin-top:16px">
-    <a class="card" href="#/saved"><span class="ico">${ico('save')}</span><b>Saved</b><small>${saved ? saved + ' saved item' + (saved > 1 ? 's' : '') : 'Pages, videos and answers you keep'} on this device</small></a>
-    <a class="card" href="#/ask"><span class="ico">${ico('ask')}</span><b>Chats</b><small>${chats ? chats + ' saved conversation' + (chats > 1 ? 's' : '') : 'Ask the library a question'}</small></a>
-    <a class="card" href="#/prepare"><span class="ico">${ico('prep')}</span><b>Prepare your household</b><small>Getting-ready readings from every guide</small></a>
+    <a class="card" href="#/saved"><span class="ico">${ico('save')}</span><b>${I18n.t("common.saved")}</b><small>${saved ? saved + " " + I18n.t("app.library.saved_item") + (saved > 1 ? 's' : '') : I18n.t("app.library.pages_videos_and_answers_you_keep")} ${I18n.t("app.library.on_this_device")}</small></a>
+    <a class="card" href="#/ask"><span class="ico">${ico('ask')}</span><b>${I18n.t("common.chats")}</b><small>${chats ? chats + " " + I18n.t("app.library.saved_conversation") + (chats > 1 ? 's' : '') : I18n.t("app.library.ask_the_library_a_question")}</small></a>
+    <a class="card" href="#/prepare"><span class="ico">${ico('prep')}</span><b>${I18n.t("app.library.prepare_your_household")}</b><small>${I18n.t("app.library.getting_ready_readings_from_every_guide")}</small></a>
   </div>
-  ${secHead('Learn a skill', 'Step-by-step routes that start simple')}
-  <div class="needs">${learnTopics().map(t => `<a class="need" href="#/t/${t.id}" ${tcStyle(t.id)}><span class="ico">${ico(t.id)}</span><b>${esc(SHORT[t.id] || t.title)}</b><small>${esc(t.short || '')} · ${(t.route || []).length} steps</small></a>`).join('')}</div>
-  ${zims.length ? secHead('Encyclopedias', 'Complete offline copies', '<a href="#/encyclopedias">Search them</a>') + `<div class="cards2">${zims.map(z => `<a class="card" href="#/wiki/${z[0]}/?from=${encodeURIComponent('#/library')}"><span class="ico">${ico(z[3])}</span><b>${esc(z[1])}</b><small>${esc(z[2])}</small></a>`).join('')}</div>` : ''}
-  ${secHead('Browse by subject', 'Every manual, saved web page and video')}<div id="shelves"><p class="loading">Loading…</p></div>
-  <p style="margin-top:20px"><a href="#/about">About this library and its sources</a>${IN_WINDOW ? ' · <a href="/ui/setup.html#manage">Library and local AI</a>' : ''}</p>`;
+  ${secHead(I18n.t("app.home.learn_a_skill"), I18n.t("app.library.step_by_step_routes_that_start"))}
+  <div class="needs">${learnTopics().map(t => `<a class="need" href="#/t/${t.id}" ${tcStyle(t.id)}><span class="ico">${ico(t.id)}</span><b>${esc(SHORT[t.id] || t.title)}</b><small>${esc(t.short || '')} · ${(t.route || []).length} ${I18n.t("app.home.steps")}</small></a>`).join('')}</div>
+  ${zims.length ? secHead(I18n.t("common.encyclopedias"), I18n.t("app.library.complete_offline_copies"), `<a href="#/encyclopedias">${I18n.t("app.library.search_them")}</a>`) + `<div class="cards2">${zims.map(z => `<a class="card" href="#/wiki/${z[0]}/?from=${encodeURIComponent('#/library')}"><span class="ico">${ico(z[3])}</span><b>${esc(z[1])}</b><small>${esc(z[2])}</small></a>`).join('')}</div>` : ''}
+  ${secHead(I18n.t("app.library.browse_by_subject"), I18n.t("app.library.every_manual_saved_web_page_and"))}<div id="shelves"><p class="loading">${I18n.t("common.loading")}</p></div>
+  <p style="margin-top:20px"><a href="#/about">${I18n.t("app.library.about_this_library_and_its_sources")}</a>${IN_WINDOW ? ` · <a href="/ui/setup.html#manage">${I18n.t("app.library.library_and_local_ai")}</a>` : ''}</p>`;
   try {
     const sh = await api('/api/shelves');
-    $('#shelves').innerHTML = sh.filter(s => s.read + s.video).map(s => `<a class="shelfrow" href="#/shelf/${s.id}"><span><b>${esc(s.title)}</b><small>${s.read ? s.read.toLocaleString() + ' to read' : ''}${s.read && s.video ? ' · ' : ''}${s.video ? s.video.toLocaleString() + ' videos' : ''}</small></span>${ico('right')}</a>`).join('');
+    $('#shelves').innerHTML = sh.filter(s => s.read + s.video).map(s => `<a class="shelfrow" href="#/shelf/${s.id}"><span><b>${esc(s.title)}</b><small>${s.read ? s.read.toLocaleString(I18n.french ? 'fr-FR' : undefined) + " " + I18n.t("app.library.to_read") : ''}${s.read && s.video ? ' · ' : ''}${s.video ? s.video.toLocaleString(I18n.french ? 'fr-FR' : undefined) + " " + I18n.t("common.videos_word") : ''}</small></span>${ico('right')}</a>`).join('');
   } catch (e) { $('#shelves').innerHTML = errorBox(e) }
 }
 async function prepareHub() {
-  setTitle('Prepare your household');
+  setTitle(I18n.t("app.library.prepare_your_household"));
   const list = nowTopics().filter(t => (t.prepare || []).length);
-  main.innerHTML = `<h1>Prepare your household</h1>
-  <p class="lead">Readings for getting ready before water, power or services stop — gathered from each guide. One area at a time.</p>
-  <div class="notice">A shopping list or cart isn’t the same as supplies you own, and reading isn’t the same as a practised plan.</div>
-  ${list.map(t => `<details class="more" ${tcStyle(t.id)}><summary><span class="prep-ico">${ico(t.id)}</span><span>${esc(SHORT[t.id] || t.title)} <span class="n">· ${t.prepare.length}</span></span></summary><div class="body"><ul class="list">${t.prepare.map(i => rowItem({ ...i, preview: true })).join('')}</ul><p><a href="#/t/${t.id}">Open the full guide</a></p></div></details>`).join('')}`;
+  main.innerHTML = `<h1>${I18n.t("app.library.prepare_your_household")}</h1>
+  <p class="lead">${I18n.t("app.preparehub.readings_for_getting_ready_before_water")}</p>
+  <div class="notice">${I18n.t("app.preparehub.a_shopping_list_or_cart_isn")}</div>
+  ${list.map(t => `<details class="more" ${tcStyle(t.id)}><summary><span class="prep-ico">${ico(t.id)}</span><span>${esc(SHORT[t.id] || t.title)} <span class="n">· ${t.prepare.length}</span></span></summary><div class="body"><ul class="list">${t.prepare.map(i => rowItem({ ...i, preview: true })).join('')}</ul><p><a href="#/t/${t.id}">${I18n.t("app.preparehub.open_the_full_guide")}</a></p></div></details>`).join('')}`;
 }
 async function shelfPage(id, kind, q) {
   const sh = (await api('/api/shelves')).find(s => s.id === id);
   if (!sh) return notFound();
   setTitle(sh.title);
-  main.innerHTML = `${backButton('#/library', 'Library')}${crumbs([['Library', '#/library'], [sh.title]])}<h1>${esc(sh.title)}</h1>
-  <div style="margin:14px 0 10px">${searchBox('shq', q, 'Filter by title or publisher', 'Filter')}</div>
-  <div class="chips">${[['all', 'Everything'], ['read', 'To read'], ['video', 'Videos']].map(([k, l]) => `<a class="chip ${k === kind ? 'on' : ''}" href="#/shelf/${id}?kind=${k}&q=${encodeURIComponent(q)}">${l}</a>`).join('')}</div><div id="shres"><p class="loading">Loading…</p></div>`;
+  main.innerHTML = `${backButton('#/library', I18n.t("nav.library"))}${crumbs([[I18n.t("nav.library"), '#/library'], [sh.title]])}<h1>${esc(sh.title)}</h1>
+  <div style="margin:14px 0 10px">${searchBox('shq', q, I18n.t("app.shelfpage.filter_by_title_or_publisher"), I18n.t("common.filter"))}</div>
+  <div class="chips">${[['all', I18n.t("common.everything")], ['read', I18n.t("app.shelfpage.to_read")], ['video', I18n.t("nav.videos")]].map(([k, l]) => `<a class="chip ${k === kind ? 'on' : ''}" href="#/shelf/${id}?kind=${k}&q=${encodeURIComponent(q)}">${l}</a>`).join('')}</div><div id="shres"><p class="loading">${I18n.t("common.loading")}</p></div>`;
   $('#shqF').addEventListener('submit', e => { e.preventDefault(); location.hash = `#/shelf/${id}?kind=${kind}&q=` + encodeURIComponent($('#shq').value.trim()) });
   let off = 0;
   const load = async () => {
     const d = await api(`/api/shelf/${id}?kind=${kind}&q=${encodeURIComponent(q)}&offset=${off}`);
-    const html = d.collections.map(c => `<section class="collection"><h3>${esc(c.collection)}</h3><div class="small muted">${esc(c.trust)} · ${c.count} item${c.count > 1 ? 's' : ''}</div><ul class="list">${c.items.map(r => rowItem({ src: r })).join('')}</ul>${c.count > c.items.length ? `<a class="btn ghost" href="#/collection?name=${encodeURIComponent(c.collection)}&${fromQ()}">See all ${c.count}</a>` : ''}</section>`).join('');
-    if (!off) $('#shres').innerHTML = d.collections.length ? '' : '<div class="empty">Nothing here matches. Try another word.</div>';
+    const html = d.collections.map(c => `<section class="collection"><h3>${esc(c.collection)}</h3><div class="small muted">${esc(c.trust)} · ${c.count} ${I18n.t("common.item_word")}${c.count > 1 ? 's' : ''}</div><ul class="list">${c.items.map(r => rowItem({ src: r })).join('')}</ul>${c.count > c.items.length ? `<a class="btn ghost" href="#/collection?name=${encodeURIComponent(c.collection)}&${fromQ()}">${I18n.t("app.videoshome.see_all")} ${c.count}</a>` : ''}</section>`).join('');
+    if (!off) $('#shres').innerHTML = d.collections.length ? '' : `<div class="empty">${I18n.t("app.load.nothing_here_matches_try_another_word")}</div>`;
     $('#shres').insertAdjacentHTML('beforeend', html);
     $('#moreb')?.remove();
-    if (d.more) { $('#shres').insertAdjacentHTML('beforeend', '<p><button class="btn plain" id="moreb">Show more</button></p>'); $('#moreb').onclick = () => { off += 40; load() } }
+    if (d.more) { $('#shres').insertAdjacentHTML('beforeend', `<p><button class="btn plain" id="moreb">${I18n.t("app.load.show_more")}</button></p>`); $('#moreb').onclick = () => { off += 40; load() } }
   };
   await load();
 }
 async function collectionPage(name, from) {
   setTitle(name);
-  main.innerHTML = `<div>${backButton(from, 'Library')}</div><h1 style="margin-top:12px">${esc(name)}</h1><ul class="list collection" id="cl"></ul><div id="cm"></div>`;
+  main.innerHTML = `<div>${backButton(from, I18n.t("nav.library"))}</div><h1 style="margin-top:12px">${esc(name)}</h1><ul class="list collection" id="cl"></ul><div id="cm"></div>`;
   let off = 0;
   const load = async () => {
     const d = await api('/api/collection?name=' + encodeURIComponent(name) + '&offset=' + off);
     $('#cl').insertAdjacentHTML('beforeend', d.items.map(r => rowItem({ src: r })).join(''));
-    $('#cm').innerHTML = d.more ? '<button class="btn plain" id="cmb">Show more</button>' : '';
+    $('#cm').innerHTML = d.more ? `<button class="btn plain" id="cmb">${I18n.t("app.load.show_more")}</button>` : '';
     if (d.more) $('#cmb').onclick = () => { off += 60; load() };
   };
   await load();
@@ -1071,48 +1071,48 @@ async function collectionPage(name, from) {
 
 /* -------------------------------------------------------------- saved -- */
 async function savedPage() {
-  setTitle('Saved');
+  setTitle(I18n.t("common.saved"));
   const s = store.get('saved', []), r = await recents();
   const li = x => `<li><a class="row" href="${esc(x.href)}"><span class="k">${ico(x.key[0] === 'v' ? 'video' : x.key[0] === 'w' ? 'wiki' : x.key[0] === 't' ? 'book' : x.key[0] === 'a' ? 'ask' : 'page')}</span><span><b>${esc(x.title)}</b><small>${esc(rowSub(x))}</small></span></a></li>`;
   const cont = await resumable();
-  main.innerHTML = `<h1>Saved</h1><p class="lead">Kept on this device only.</p>
-  ${s.length ? `<div class="collection" style="margin-top:18px"><ul class="list">${s.map(li).join('')}</ul></div>` : `<div class="empty"><span class="e-ico">${ico('save')}</span><b>Nothing saved yet</b><p>Choose Save on any page, video, article or answer to keep it here.</p></div>`}
-  ${cont.length ? secHead('Continue watching') + rail(cont.map(([id, v]) => vcard({ id, title: v.title, thumb: v.thumb, duration: v.d }, { sub: 'Resume at ' + clock(v.t) })).join('')) : ''}
-  ${secHead('Recently opened')}${r.length ? `<div class="collection"><ul class="list">${r.map(li).join('')}</ul></div><p><button class="btn plain" id="clr">Clear recent list</button></p>` : '<div class="empty"><p>Pages you open will appear here.</p></div>'}`;
+  main.innerHTML = `<h1>${I18n.t("common.saved")}</h1><p class="lead">${I18n.t("app.savedpage.kept_on_this_device_only")}</p>
+  ${s.length ? `<div class="collection" style="margin-top:18px"><ul class="list">${s.map(li).join('')}</ul></div>` : `<div class="empty"><span class="e-ico">${ico('save')}</span><b>${I18n.t("app.savedpage.nothing_saved_yet")}</b><p>${I18n.t("app.savedpage.choose_save_on_any_page_video")}</p></div>`}
+  ${cont.length ? secHead(I18n.t("videos.resume.title")) + rail(cont.map(([id, v]) => vcard({ id, title: v.title, thumb: v.thumb, duration: v.d }, { sub: I18n.t("app.continueitems.resume_at") + " " + clock(v.t) })).join('')) : ''}
+  ${secHead(I18n.t("app.savedpage.recently_opened"))}${r.length ? `<div class="collection"><ul class="list">${r.map(li).join('')}</ul></div><p><button class="btn plain" id="clr">${I18n.t("app.savedpage.clear_recent_list")}</button></p>` : `<div class="empty"><p>${I18n.t("app.savedpage.pages_you_open_will_appear_here")}</p></div>`}`;
   const c = $('#clr'); if (c) c.onclick = () => { store.set('recent', []); savedPage() };
 }
 
 /* -------------------------------------------------------------- about -- */
 // What the assistant cannot read, as a sentence: counts of none are left out, and one is one
-const many = (n, one, more) => `${n.toLocaleString()} ${n === 1 ? one : more}`;
+const many = (n, one, more) => `${n.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${n === 1 ? one : more}`;
 function blind(c) {
   if (!c) return '';
   const nv = c.videos - c.videos_with_text, parts = [];
-  if (nv) parts.push(`${nv.toLocaleString()} of ${many(c.videos, 'video', 'videos')} ${nv === 1 ? 'has' : 'have'} no captions or transcript`);
-  if (c.pdfs_image_only) parts.push(`${many(c.pdfs_image_only, 'PDF is a scan', 'PDFs are scans')} without text`);
-  if (c.docs_without_text) parts.push(`${many(c.docs_without_text, 'document', 'documents')} gave no readable text when indexed`);
+  if (nv) parts.push(I18n.t('about.coverage.videos', { missing: I18n.number(nv), total: I18n.number(c.videos), kind: c.videos === 1 ? 'video' : 'videos', verb: nv === 1 ? 'has' : 'have' }));
+  if (c.pdfs_image_only) parts.push(`${many(c.pdfs_image_only, I18n.t("app.blind.pdf_is_a_scan"), I18n.t("app.blind.pdfs_are_scans"))} ${I18n.t("app.blind.without_text")}`);
+  if (c.docs_without_text) parts.push(`${many(c.docs_without_text, I18n.t('about.coverage.documents'), I18n.t('about.coverage.documents_plural'))} ${I18n.t("app.blind.gave_no_readable_text_when_indexed")}`);
   if (!parts.length) return '';
-  const t = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
+  const t = parts.length > 1 ? parts.slice(0, -1).join(', ') + I18n.t('setup.selection.join') + parts[parts.length - 1] : parts[0];
   return t[0].toUpperCase() + t.slice(1) + '. ';
 }
 // The optional local AI in the desktop app: what it is, where it runs, and its controls. '' in the server version.
 function localAbout(st) {
   const l = st.local; if (!l) return '';
-  const gb = n => (n / 1e9).toFixed(1) + ' GB';
-  const where = (l.placement || []).filter(p => p.bytes > 2e8).map(p => `${gb(p.bytes)} on ${esc(p.device)}`).join(', ');
-  const line = { ready: 'running now', stopped: 'ready; it starts when you ask and stops after 15 minutes unused', loading: 'starting' }[l.state];
+  const gb = n => I18n.fixed(n / 1e9, 1) + " " + I18n.t("common.gb");
+  const where = (l.placement || []).filter(p => p.bytes > 2e8).map(p => `${gb(p.bytes)} ${I18n.t("common.on_word")} ${esc(p.device)}`).join(', ');
+  const line = { ready: I18n.t("app.line.running_now"), stopped: I18n.t("app.line.ready_it_starts_when_you_ask"), loading: I18n.t('about.ai.starting') }[l.state];
   const btn = (a, t) => `<button class="btn plain" onclick="localAI('${a}')">${t}</button>`;
-  return line ? `Local AI: ${esc(l.name)}, ${line}.${where ? ` It uses ${where}.` : ''} It reads text only.
-      <span class="row">${l.state === 'ready' ? btn('stop', 'Stop it now') : ''}${btn('off', 'Turn off')}</span>`
-    : l.state === 'off' ? `The local AI is turned off. ${btn('on', 'Turn on')}`
-    : `Local AI: ${esc(l.message || { absent: 'not added. Add it in Library and local AI (about 17 GB).', checking: 'checking the file…', measuring: 'checking this computer’s memory…' }[l.state] || l.state)} ${l.state === 'absent' ? '<a class="btn plain" href="/ui/setup.html#manage">Add the local AI</a>' : ''}${btn('rescan', 'Look again')}`;
+  return line ? `${I18n.t("app.localabout.local_ai")} ${esc(l.name)}, ${line}.${where ? ` ${I18n.t("app.localabout.it_uses")} ${where}.` : ''} ${I18n.t("app.localabout.it_reads_text_only")}
+      <span class="row">${l.state === 'ready' ? btn('stop', I18n.t("app.localabout.stop_it_now")) : ''}${btn('off', I18n.t("app.localabout.turn_off"))}</span>`
+    : l.state === 'off' ? `${I18n.t("app.localabout.the_local_ai_is_turned_off")} ${btn('on', I18n.t("app.localabout.turn_on"))}`
+    : `${I18n.t("app.localabout.local_ai")} ${esc(l.message ? I18n.error(l.message) : { absent: I18n.t("app.localabout.not_added_add_it_in_library"), checking: I18n.t("app.localabout.checking_the_file"), measuring: I18n.t("app.localabout.checking_this_computer_s_memory") }[l.state] || I18n.label(l.state))} ${l.state === 'absent' ? `<a class="btn plain" href="/ui/setup.html#manage">${I18n.t("app.localabout.add_the_local_ai")}</a>` : ''}${btn('rescan', I18n.t("app.localabout.look_again"))}`;
 }
 async function localAI(action) {
   try { await fetch('/api/assistant/local', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) }) } catch { }
   setTimeout(() => { if (location.hash.startsWith('#/about')) route() }, 400);
 }
 async function about() {
-  setTitle('About this library');
+  setTitle(I18n.t("about.title"));
   let dl = {}, st = {};
   LIB = null;   // About shows the counts as they are now
   const s = await libInfo();
@@ -1120,30 +1120,32 @@ async function about() {
   try { dl = await api('/api/download-status') } catch { }
   try { st = await fetch('/api/assistant/status').then(r => r.json()) } catch { }   // not api(): this answer names an error when no model is running, and still holds what is wanted
   const ch = dl.channels && dl.channels.counts, ix = st.index || {};
-  main.innerHTML = `<h1>About this library</h1>
-  <p class="lead">Public manuals, health guides, courses, videos and encyclopedias kept on this computer, so it works when the internet and phones don’t.</p>
+  main.innerHTML = `<h1>${I18n.t("about.title")}</h1>
+  <p class="lead">${I18n.t("about.intro")}</p>
   <div class="cards2" style="margin-top:16px">
-   <div class="card"><b>What’s in it</b><small>${(s.pdfs || 0).toLocaleString()} PDF manuals (${(s.pdf_pages || 0).toLocaleString()} pages), ${(s.web_pages || 0).toLocaleString()} saved web pages, ${(s.videos || 0).toLocaleString()} downloaded videos and ${s.collections || 0} complete encyclopedias.</small></div>
-   ${ch ? `<div class="card"><b>Still arriving</b><small>${ch.pending.toLocaleString()} more videos are queued and ${ch.downloading} downloading. Queued videos are not in the library yet — they appear only once downloaded.</small></div>` : ''}
-   <div class="card"><b>Assistant</b><small>${localAbout(st) || (st.online ? `Local model ${esc(st.model)} — available.` : 'No local model is running, so Chat can’t write answers right now. Guides, search, videos and the map all work without one.')} ${ix.chunks ? `Meaning-based index: ${ix.chunks.toLocaleString()} passages from ${ix.docs.toLocaleString()} documents${ix.pending ? `, ${ix.pending.toLocaleString()} still to index` : ''}.` : ''}</small></div>
-   <div class="card"><b>What the assistant can’t see</b><small>${blind(st.coverage)}It also can’t see pictures in videos or raw map data. It reads text${st.vision === false ? '' : ' (and page images when it asks to)'} and says when it finds nothing.${st.coverage && st.coverage.remote_videos ? ` ${st.coverage.remote_videos} videos are stored on a remote drive and play only when that computer is reachable.` : ''}</small></div>
+   <div class="card"><b>${I18n.t("about.contents.title")}</b><small>${(s.pdfs || 0).toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.pdf_manuals")}${(s.pdf_pages || 0).toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.pages")} ${(s.web_pages || 0).toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.saved_web_pages")} ${(s.videos || 0).toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.downloaded_videos_and")} ${s.collections || 0} ${I18n.t("app.about.complete_encyclopedias")}</small></div>
+   ${ch ? `<div class="card"><b>${I18n.t("app.about.still_arriving")}</b><small>${ch.pending.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.more_videos_are_queued_and")} ${ch.downloading} ${I18n.t("app.about.downloading_queued_videos_are_not_in")}</small></div>` : ''}
+   <div class="card"><b>${I18n.t("common.assistant")}</b><small>${localAbout(st) || (st.online ? `${I18n.t("app.about.local_model")} ${esc(st.model)} ${I18n.t("app.about.available")}` : I18n.t("app.about.no_local_model_is_running_so"))} ${ix.chunks ? `${I18n.t("app.about.meaning_based_index")} ${ix.chunks.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.passages_from")} ${ix.docs.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("common.documents_word")}${ix.pending ? `, ${ix.pending.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("app.about.still_to_index")}` : ''}.` : ''}</small></div>
+   <div class="card"><b>${I18n.t("about.coverage.title")}</b><small>${blind(st.coverage)}${I18n.t("app.about.it_also_can_t_see_pictures")}${st.vision === false ? '' : " " + I18n.t("common.and_page_images_when_it_asks_to")} ${I18n.t("app.about.and_says_when_it_finds_nothing")}${st.coverage && st.coverage.remote_videos ? ` ${st.coverage.remote_videos} ${I18n.t("app.about.videos_are_stored_on_a_remote")}` : ''}</small></div>
    ${IN_WINDOW && window.LBUpdate ? LBUpdate.card() : ''}
   </div>
-  <h2>How sources are labelled</h2><ul>
-   <li><b>International health &amp; humanitarian guidance</b> — WHO, Red Cross / Red Crescent, MSF, UNICEF, Sphere, St John Ambulance.</li>
-   <li><b>Hesperian community health guide</b> — “Where There Is No Doctor” and related books.</li>
-   <li><b>Government guidance</b> — FEMA, CDC, EPA, USDA, NOAA, National Park Service and similar.</li>
-   <li><b>University / extension service</b> — e.g. National Center for Home Food Preservation, UC extension.</li>
-   <li><b>Manufacturer manual</b> — only for the exact model named.</li>
-   <li><b>Community-written encyclopedia</b> and <b>hobbyist video</b> — background; check anything risky against a manual.</li></ul>
-  <h2>What this guide does not do</h2><ul>
-   <li>It points to original pages; the guides don’t write their own medical, chemical or electrical instructions. The assistant’s answers mark which sentences come from a cited page and which are its own wording.</li>
-   <li>Nothing here replaces trained help. Each guide shows the sources’ own limits.</li>
-   <li>Reading and watching are not the same as practising. Your ticks stay on this device.</li>
-   ${s.pack ? '' : '<li>Shopping lists and carts in older reports are plans, not proof of supplies you own.</li>'}</ul>
-  ${s.sources ? `<h2>Sources and credits</h2><p><a href="#/read/${encodeURIComponent(s.sources)}?${fromQ()}">Sources and permissions</a>: every publisher in this library, where it came from, and how to ask for something to be removed.</p>` : ''}
-  ${IN_WINDOW ? '' : '<h2>Using it on a phone</h2><p>Phones on the same Wi-Fi (no internet needed) can use the guide when this computer starts it with <code>server.py --lan</code>. Phones need the access link shown in the terminal the first time.</p>'}
-  ${oldServer ? '<h2>Other ways in</h2><p><a href="/reports/gap-closure-status.html" target="_blank">Gap closure report</a> · <a href="/reports/learning-pathways.html" target="_blank">Learning pathways report</a> · <a href="/reports/survival-tools-cart.html" target="_blank">Supplies planning</a></p>' : ''}`;
+  <h2>${I18n.t("about.sources.title")}</h2><ul>
+   <li><b>${I18n.t("app.about.international_health_amp_humanitarian_guidance")}</b> ${I18n.t("app.about.who_red_cross_red_crescent_msf")}</li>
+   <li><b>${I18n.t("app.about.hesperian_community_health_guide")}</b> ${I18n.t("app.about.where_there_is_no_doctor_and")}</li>
+   <li><b>${I18n.t("app.about.government_guidance")}</b> ${I18n.t("app.about.fema_cdc_epa_usda_noaa_national")}</li>
+   <li><b>${I18n.t("app.about.university_extension_service")}</b> ${I18n.t("app.about.e_g_national_center_for_home")}</li>
+   <li><b>${I18n.t("app.about.manufacturer_manual")}</b> ${I18n.t("app.about.only_for_the_exact_model_named")}</li>
+   <li><b>${I18n.t("app.about.community_written_encyclopedia")}</b> ${I18n.t("common.and_word")} <b>${I18n.t("app.about.hobbyist_video")}</b> ${I18n.t("app.about.background_check_anything_risky_against_a")}</li></ul>
+  <h2>${I18n.t("about.limits.title")}</h2><ul>
+   <li>${I18n.t("app.about.it_points_to_original_pages_the")}</li>
+   <li>${I18n.t("app.about.nothing_here_replaces_trained_help_each")}</li>
+   <li>${I18n.t("app.about.reading_and_watching_are_not_the")}</li>
+   ${s.pack ? '' : `<li>${I18n.t("app.about.shopping_lists_and_carts_in_older")}</li>`}</ul>
+  ${s.sources ? `<h2>${I18n.t("app.about.sources_and_credits")}</h2><p><a href="#/read/${encodeURIComponent(s.sources)}?${fromQ()}">${I18n.t("app.about.sources_and_permissions")}</a>${I18n.t("app.about.every_publisher_in_this_library_where")}</p>` : ''}
+  ${IN_WINDOW ? '' : `<h2>${I18n.t("app.about.using_it_on_a_phone")}</h2><p>${I18n.t("app.about.phones_on_the_same_wi_fi")} <code>server.py --lan</code>${I18n.t('about.phone.access')}</p>`}
+  ${oldServer ? `<h2>${I18n.t("app.about.other_ways_in")}</h2><p><a href="/reports/gap-closure-status.html" target="_blank">${I18n.t("app.about.gap_closure_report")}</a> · <a href="/reports/learning-pathways.html" target="_blank">${I18n.t("app.about.learning_pathways_report")}</a> · <a href="/reports/survival-tools-cart.html" target="_blank">${I18n.t("app.about.supplies_planning")}</a></p>` : ''}`;
+  main.insertAdjacentHTML('beforeend', `<p><label for="uiLanguage">${I18n.t('about.language.label')}</label> <select id="uiLanguage"><option value="en"${I18n.language === 'en' ? ' selected' : ''}>${I18n.t('about.language.english')}</option><option value="fr"${I18n.language === 'fr' ? ' selected' : ''}>${I18n.t('about.language.french')}</option></select></p>`);
+  $('#uiLanguage').onchange = e => I18n.choose(e.target.value);
   if (IN_WINDOW && window.LBUpdate) LBUpdate.mount(main);   // Check for updates (web/update.js): only when the person asks
 }
 

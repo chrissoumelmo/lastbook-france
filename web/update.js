@@ -12,14 +12,14 @@
 
   function view(s) {
     const btn = (t) => `<button class="btn plain" data-upd="check">${t}</button>`;
-    const ver = s.current ? `Version ${E(s.current)}.` : 'This copy has no version number (it was not built as an app).';
+    const ver = s.current ? `${I18n.t("common.version")} ${E(s.current)}.` : I18n.t("update.ver.this_copy_has_no_version_number");
     switch (s.state) {
-      case 'checking': return `${ver} Checking for updates…`;
-      case 'up_to_date': return `${ver} Lastbook is up to date. ${btn('Check again')}`;
-      case 'available': return `${ver} Version ${E(s.version)} is available. Download it from ${E(s.website)}. Your library, local AI and chats stay. ${btn('Check again')}`;
-      case 'not_published': return `${ver} No update information yet. ${btn('Try again')}`;
-      case 'too_old_os': case 'error': return `${ver} ${E(s.message)} ${btn('Try again')}`;
-      default: return `${ver} ${btn('Check for updates')}`;
+      case 'checking': return `${ver} ${I18n.t("update.view.checking_for_updates")}`;
+      case 'up_to_date': return `${ver} ${I18n.t("update.view.lastbook_is_up_to_date")} ${btn(I18n.t("update.recheck"))}`;
+      case 'available': return `${ver} ${I18n.t("common.version")} ${E(s.version)} ${I18n.t("update.view.is_available_download_it_from")} ${E(s.website)}${I18n.t("common.your_library_local_ai_and_chats_stay")} ${btn(I18n.t("update.recheck"))}`;
+      case 'not_published': return `${ver} ${I18n.t("update.view.no_update_information_yet")} ${btn(I18n.t("common.retry"))}`;
+      case 'too_old_os': case 'error': return `${ver} ${E(I18n.error(s.message))} ${btn(I18n.t("common.retry"))}`;
+      default: return `${ver} ${btn(I18n.t("update.check"))}`;
     }
   }
 
@@ -31,19 +31,19 @@
 
   async function refresh(el) {
     if (!el.isConnected) return;
-    try { paint(el, await call('state')) } catch { el.textContent = 'Lastbook could not ask about updates.' }
+    try { paint(el, await call('state')) } catch { el.textContent = I18n.t("update.refresh.lastbook_could_not_ask_about_updates") }
   }
 
   async function check(el) {
     try {
       const s = await call('check');
-      if (s.error && !s.state) { el.textContent = s.error; return }
+      if (s.error && !s.state) { el.textContent = I18n.error(s.error); return }
       paint(el, s);
-    } catch { el.textContent = 'Lastbook could not ask about updates.' }
+    } catch { el.textContent = I18n.t("update.refresh.lastbook_could_not_ask_about_updates") }
   }
 
   window.LBUpdate = {
-    card: () => '<div class="card"><b>Lastbook app</b><small id="updBox">…</small></div>',
+    card: () => `<div class="card"><b>${I18n.t("update.update.lastbook_app")}</b><small id="updBox">…</small></div>`,
     mount(root) {
       const el = root.querySelector('#updBox'); if (!el) return;
       el.addEventListener('click', e => { if (e.target.closest('[data-upd]')) check(el) });

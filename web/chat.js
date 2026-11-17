@@ -2,21 +2,21 @@
 /* "Ask the library" — chat with the local model, grounded in the library. Conversations stay on this device only. */
 const Chat = (() => {
   const STARTERS = [
-    ['water', 'The tap water is off. How do I make water safe to drink?'],
-    ['hurt', 'Someone has a deep cut that won’t stop bleeding. What do I do?'],
-    ['power', 'How do I run a generator safely during a power outage?'],
-    ['food', 'The fridge has been off for 6 hours. What food is still safe?'],
-    ['sanitation', 'The toilets don’t work. How do we make an emergency toilet?'],
-    ['comms', 'Phones are down. How can our household stay in contact?'],
-    ['grow', 'What vegetables can I plant this month?'],
-    ['repair', 'How do I change the oil on a Honda EU2200i generator?'],
+    ['water', I18n.t("chat.starters.the_tap_water_is_off_how")],
+    ['hurt', I18n.t("chat.starters.someone_has_a_deep_cut_that")],
+    ['power', I18n.t("chat.starters.how_do_i_run_a_generator")],
+    ['food', I18n.t("chat.starters.the_fridge_has_been_off_for")],
+    ['sanitation', I18n.t("chat.starters.the_toilets_don_t_work_how")],
+    ['comms', I18n.t("chat.starters.phones_are_down_how_can_our")],
+    ['grow', I18n.t("chat.starters.what_vegetables_can_i_plant_this")],
+    ['repair', I18n.t("chat.starters.how_do_i_change_the_oil")],
   ];
-  const ABOUT_STARTERS = { doc: ['Explain this page in simple words', 'What are the warnings on this page?', 'Is there a video that shows this?'],
-    video: ['Summarise what this video shows', 'What safety points does this video make?', 'Find a manual page that covers the same thing'],
-    topic: ['What should I do first?', 'What are the most important warnings?', 'Which video should I watch first?'] };
-  const STATES = { starting: 'Starting the local AI…', thinking: 'Thinking…', searching: 'Searching the library…', reading: 'Reading the pages it found…', writing: 'Writing the answer…' };
+  const ABOUT_STARTERS = { doc: [I18n.t("chat.about_starters.explain_this_page_in_simple_words"), I18n.t("chat.about_starters.what_are_the_warnings_on_this"), I18n.t("chat.about_starters.is_there_a_video_that_shows")],
+    video: [I18n.t("chat.about_starters.summarise_what_this_video_shows"), I18n.t("chat.about_starters.what_safety_points_does_this_video"), I18n.t("chat.about_starters.find_a_manual_page_that_covers")],
+    topic: [I18n.t("chat.about_starters.what_should_i_do_first"), I18n.t("chat.about_starters.what_are_the_most_important_warnings"), I18n.t("chat.about_starters.which_video_should_i_watch_first")] };
+  const STATES = { starting: I18n.t("chat.states.starting_the_local_ai"), thinking: I18n.t("chat.states.thinking"), searching: I18n.t("chat.states.searching_the_library"), reading: I18n.t("chat.states.reading_the_pages_it_found"), writing: I18n.t("chat.states.writing_the_answer") };
   // Where an answer is: search, then read, then write (none yet while the local AI starts). A later round can search again, so a step can light up a second time.
-  const STAGES = ['Search', 'Read', 'Write'], STAGE_AT = { starting: -1, thinking: 0, searching: 0, reading: 1, writing: 2 };
+  const STAGES = [I18n.t("common.search"), I18n.t("common.read"), I18n.t("common.write")], STAGE_AT = { starting: -1, thinking: 0, searching: 0, reading: 1, writing: 2 };
   function progress(m) {
     const at = STAGE_AT[m.state] ?? 0, pct = m.state === 'starting' && m.pct ? Math.max(0, Math.min(100, +m.pct || 0)) : null;
     const stages = STAGES.map((t, i) => `<li class="${i < at ? 'done' : i === at ? 'now' : ''}">${t}</li>`).join('');
@@ -46,36 +46,36 @@ const Chat = (() => {
     if (id && !cur) { swap('#/ask'); return }
     const about = q.get('about');
     aboutCtx = !cur && about ? await describe(about) : (cur && cur.about ? cur.aboutInfo : null);
-    document.title = (cur ? cur.title : 'Chat') + ' · Lastbook';
-    $('#tbTitle').textContent = cur ? cur.title : 'Chat';
+    document.title = (cur ? cur.title : I18n.t("nav.chat")) + " " + I18n.t("app.settitle.lastbook");
+    $('#tbTitle').textContent = cur ? cur.title : I18n.t("nav.chat");
     main.innerHTML = `<div class="chat">
-      <aside class="chat-side" id="chatSide" aria-label="Conversations">
-        <div class="cs-head"><b>Chats</b><button class="iconbtn" id="closeSide" aria-label="Close chat list">${ico('back')}</button></div>
-        <a class="btn plain" href="#/ask" id="newChat2">${ico('ask')}New chat</a>
+      <aside class="chat-side" id="chatSide" aria-label="${I18n.t("common.conversations")}">
+        <div class="cs-head"><b>${I18n.t("common.chats")}</b><button class="iconbtn" id="closeSide" aria-label="${I18n.t("chat.page.close_chat_list")}">${ico('back')}</button></div>
+        <a class="btn plain" href="#/ask" id="newChat2">${ico('ask')}${I18n.t("chat.new")}</a>
         <ul class="cs-list" id="csList"></ul>
         <div class="cs-privacy">
-          <label><input type="checkbox" id="keepChats" ${keep() ? 'checked' : ''}> Keep chat history on this device</label>
-          <p class="small muted">Chats stay on this device. Nothing is sent anywhere except this computer’s own assistant.</p>
-          <button class="btn plain" id="clearChats">Delete all chats</button>
+          <label><input type="checkbox" id="keepChats" ${keep() ? 'checked' : ''}> ${I18n.t("chat.page.keep_chat_history_on_this_device")}</label>
+          <p class="small muted">${I18n.t("chat.page.chats_stay_on_this_device_nothing")}</p>
+          <button class="btn plain" id="clearChats">${I18n.t("chat.page.delete_all_chats")}</button>
         </div>
       </aside>
       <section class="chat-main">
         <div class="chat-top">
-          <button class="btn plain chat-histbtn" id="openSide" aria-label="Show chats">${ico("clock")}<span>Chats</span></button>
+          <button class="btn plain chat-histbtn" id="openSide" aria-label="${I18n.t("chat.page.show_chats")}">${ico("clock")}<span>${I18n.t("common.chats")}</span></button>
           <div class="chat-status" id="chatStatus" aria-live="polite"></div>
-          <a class="btn plain" href="#/ask" id="newChat" aria-label="New chat">${ico('ask')}<span>New</span></a>
+          <a class="btn plain" href="#/ask" id="newChat" aria-label="${I18n.t("chat.new")}">${ico('ask')}<span>${I18n.t("common.new")}</span></a>
         </div>
         ${q.get('from') && !cur ? `<div style="margin:2px 0 8px">${backButton(q.get('from'))}</div>` : ''}
         <div class="ai-setup" id="aiSetup" hidden></div>
-        <div class="chat-log" id="chatLog" role="log" aria-live="polite" aria-label="Conversation"></div>
+        <div class="chat-log" id="chatLog" role="log" aria-live="polite" aria-label="${I18n.t("common.conversation")}"></div>
         <form class="composer" id="composer">
           <div class="ctxchip" id="ctxChip" hidden></div>
           <div class="comp-row">
-            <label class="sr" for="chatIn">Your question</label>
-            <textarea id="chatIn" rows="1" placeholder="Ask a question…" enterkeyhint="send"></textarea>
-            <button class="sendbtn" id="sendBtn" aria-label="Send">${ico("up")}</button>
+            <label class="sr" for="chatIn">${I18n.t("chat.composer.label")}</label>
+            <textarea id="chatIn" rows="1" placeholder="${I18n.t("chat.composer.placeholder")}" enterkeyhint="send"></textarea>
+            <button class="sendbtn" id="sendBtn" aria-label="${I18n.t("chat.composer.send")}">${ico("up")}</button>
           </div>
-          <p class="comp-note">Answers come from the library on this computer and can be wrong. Check the linked pages; get trained help for anything serious.</p>
+          <p class="comp-note">${I18n.t("chat.page.answers_come_from_the_library_on")}</p>
         </form>
       </section></div>`;
     renderSide(); renderCtx(); renderLog();
@@ -90,9 +90,9 @@ const Chat = (() => {
     $('#closeSide').onclick = () => $('#chatSide').classList.remove('open');
     $('#keepChats').onchange = e => {
       try { localStorage.setItem('sg.chatKeep', e.target.checked ? 'yes' : 'no') } catch { }
-      if (!e.target.checked) { try { localStorage.removeItem('sg.chats') } catch { } toast('Chats will be forgotten when you close this page') } else { persist(); toast('Chats will be kept on this device') }
+      if (!e.target.checked) { try { localStorage.removeItem('sg.chats') } catch { } toast(I18n.t("chat.page.chats_will_be_forgotten_when_you")) } else { persist(); toast(I18n.t("chat.page.chats_will_be_kept_on_this")) }
     };
-    $('#clearChats').onclick = () => { if (!confirm('Delete all chats on this device?')) return; Object.values(live).forEach(l => l.abort && l.abort()); chats = []; try { localStorage.removeItem('sg.chats') } catch { } location.hash = '#/ask' };
+    $('#clearChats').onclick = () => { if (!confirm(I18n.t("chat.page.delete_all_chats_on_this_device"))) return; Object.values(live).forEach(l => l.abort && l.abort()); chats = []; try { localStorage.removeItem('sg.chats') } catch { } location.hash = '#/ask' };
     leaving = () => { document.removeEventListener('keydown', escStop) };
     document.addEventListener('keydown', escStop);
     statusLine();
@@ -107,33 +107,34 @@ const Chat = (() => {
   const busy = () => cur && live[cur.id] && live[cur.id].running;
   // The optional local AI (desktop app): [ready?, the line to show]. The server version has no s.local.
   function localLine(l) {
-    const gb = n => (n / 1e9).toFixed(0) + ' GB';
+    const message = l.message ? I18n.error(l.message) : '';
+    const gb = n => (n / 1e9).toFixed(0) + " " + I18n.t("common.gb");
     return ({
-      ready: [true, 'Local AI ready'],
-      stopped: [true, 'Local AI ready · it starts when you ask'],
-      loading: [true, `Starting the local AI${l.pct ? ' ' + l.pct + '%' : '…'}`],
-      checking: [false, `Checking the local AI file${l.pct != null ? ' ' + l.pct + '%' : '…'}`],
-      measuring: [false, 'Checking this computer’s memory…'],
-      absent: [false, 'No local AI added'],
-      wrong: [false, l.message || 'The local AI file is not the right one.'],
-      too_big: [false, l.message || `The local AI needs about ${gb(l.needs_bytes || 0)} of memory.`],
-      off: [false, 'Local AI is off'],
-      error: [false, l.message || 'The local AI could not start.'],
-    })[l.state] || [false, l.message || 'Local AI unavailable'];
+      ready: [true, I18n.t("chat.localline.local_ai_ready")],
+      stopped: [true, I18n.t("chat.localline.local_ai_ready_it_starts_when")],
+      loading: [true, `${I18n.t("chat.localline.starting_the_local_ai")}${l.pct ? ' ' + l.pct + '%' : '…'}`],
+      checking: [false, `${I18n.t("chat.localline.checking_the_local_ai_file")}${l.pct != null ? ' ' + l.pct + '%' : '…'}`],
+      measuring: [false, I18n.t("chat.localline.checking_this_computer_s_memory")],
+      absent: [false, I18n.t("chat.localline.no_local_ai_added")],
+      wrong: [false, message || I18n.t("chat.localline.the_local_ai_file_is_not")],
+      too_big: [false, message || `${I18n.t("chat.localline.the_local_ai_needs_about")} ${gb(l.needs_bytes || 0)} ${I18n.t("chat.localline.of_memory")}`],
+      off: [false, I18n.t("chat.localline.local_ai_is_off")],
+      error: [false, message || I18n.t("chat.localline.the_local_ai_could_not_start")],
+    })[l.state] || [false, message || I18n.t("chat.localline.local_ai_unavailable")];
   }
   let polling = null;
   async function statusLine() {
     const s = await getStatus(), el = $('#chatStatus'); if (!el) return;
     const ix = s.index || {}, l = s.local;
-    const still = ix.state === 'indexing' || ix.state === 'indexing (other process)' ? ` · <span class="muted">still indexing (${(ix.chunks || 0).toLocaleString()} passages so far)</span>` : '';
+    const still = ix.state === 'indexing' || ix.state === 'indexing (other process)' ? ` · <span class="muted">${I18n.t("chat.still.still_indexing")}${(ix.chunks || 0).toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("chat.still.passages_so_far")}</span>` : '';
     if (l && (/ready|stopped|loading/.test(l.state) || !s.online)) {
       const [ok, line] = localLine(l);
-      el.innerHTML = `<span class="${ok ? 'dotok' : 'dotoff'}"></span><span>${esc(line)}${ok ? still : '<span class="long"> — search and reading still work</span>'}</span>`;
+      el.innerHTML = `<span class="${ok ? 'dotok' : 'dotoff'}"></span><span>${esc(I18n.label(line))}${ok ? still : `<span class="long"> ${I18n.t("chat.statusline.search_and_reading_still_work")}</span>`}</span>`;
     } else {
-      el.innerHTML = s.online ? `<span class="dotok"></span>Local assistant ready${still}`
-        : `<span class="dotoff"></span><span>Assistant offline<span class="long"> — search and browsing still work</span></span>`;
+      el.innerHTML = s.online ? `<span class="dotok"></span>${I18n.t("chat.statusline.local_assistant_ready")}${still}`
+        : `<span class="dotoff"></span><span>${I18n.t("chat.statusline.assistant_offline")}<span class="long"> ${I18n.t("chat.statusline.search_and_browsing_still_work")}</span></span>`;
     }
-    const sb = $('#sendBtn'); if (sb) sb.title = s.online ? 'Send' : 'The assistant is offline; you will get matching pages instead';
+    const sb = $('#sendBtn'); if (sb) sb.title = s.online ? I18n.t("chat.composer.send") : I18n.t("chat.statusline.the_assistant_is_offline_you_will");
     setupCard(s);
     clearTimeout(polling);
     if (l && /checking|measuring|loading/.test(l.state) && $('#chatStatus')) polling = setTimeout(statusLine, 1000);
@@ -145,11 +146,11 @@ const Chat = (() => {
     box.hidden = !show;
     if (!show) return;
     box.innerHTML = l.state === 'off'
-      ? `<p>The local AI is turned off.</p><div class="row"><button class="btn" data-ai="on">Turn on</button></div>`
-      : l.state === 'error' ? `<p>${esc(l.message || 'The local AI could not start.')}</p><div class="row"><button class="btn" data-ai="rescan">Look again</button></div>`
-      : `<p><b>Add the local AI to get written answers.</b> It is about 17 GB, and runs on this computer only.</p>
-         <div class="row"><a class="btn" href="/ui/setup.html#manage">Add the local AI</a><button class="btn plain" data-ai="rescan">Look again</button></div>
-         <p class="small">Already downloaded <code>${esc(l.file)}</code>? Put it in your <b>LastbookData</b> folder or Downloads, then Look again.</p>`;
+      ? `<p>${I18n.t("app.localabout.the_local_ai_is_turned_off")}</p><div class="row"><button class="btn" data-ai="on">${I18n.t("app.localabout.turn_on")}</button></div>`
+      : l.state === 'error' ? `<p>${esc(l.message ? I18n.error(l.message) : I18n.t("chat.localline.the_local_ai_could_not_start"))}</p><div class="row"><button class="btn" data-ai="rescan">${I18n.t("app.localabout.look_again")}</button></div>`
+      : `<p><b>${I18n.t("chat.setupcard.add_the_local_ai_to_get")}</b> ${I18n.t("chat.setupcard.it_is_about_17_gb_and")}</p>
+         <div class="row"><a class="btn" href="/ui/setup.html#manage">${I18n.t("app.localabout.add_the_local_ai")}</a><button class="btn plain" data-ai="rescan">${I18n.t("app.localabout.look_again")}</button></div>
+         <p class="small">${I18n.t("chat.setupcard.already_downloaded")} <code>${esc(l.file)}</code>${I18n.t('chat.setup.file_location')} <b>LastbookData</b> ${I18n.t("chat.setupcard.folder_or_downloads_then_look_again")}</p>`;
     $$('[data-ai]', box).forEach(b => b.onclick = async () => {
       b.disabled = true;
       try { await fetch('/api/assistant/local', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: b.dataset.ai }) }) } catch { }
@@ -159,9 +160,9 @@ const Chat = (() => {
   async function describe(about) {
     const [kind, id, n] = about.split(':');
     try {
-      if (kind === 'topic') { const t = (await topics()).find(x => x.id === id); return { about, label: t ? (SHORT[id] || t.title) : id, sub: 'Guide', kind } }
+      if (kind === 'topic') { const t = (await topics()).find(x => x.id === id); return { about, label: t ? (SHORT[id] || t.title) : id, sub: I18n.t("common.guide"), kind } }
       const d = await api('/api/doc/' + encodeURIComponent(id));
-      return { about, kind, label: d.title, sub: kind === 'video' ? (n ? 'Video at ' + clock(+n) : 'Video') : 'Page ' + (n || 1), href: kind === 'video' ? `#/watch/${encodeURIComponent(id)}${n ? '?t=' + n : ''}` : `#/read/${encodeURIComponent(id)}?p=${n || 1}` };
+      return { about, kind, label: d.title, sub: kind === 'video' ? (n ? I18n.t("chat.describe.video_at") + " " + clock(+n) : I18n.t("common.video")) : I18n.t("common.page") + " " + (n || 1), href: kind === 'video' ? `#/watch/${encodeURIComponent(id)}${n ? '?t=' + n : ''}` : `#/read/${encodeURIComponent(id)}?p=${n || 1}` };
     } catch { return null }
   }
   function renderCtx() {
@@ -169,13 +170,13 @@ const Chat = (() => {
     const a = aboutCtx;
     if (!a) { el.hidden = true; return }
     el.hidden = false;
-    el.innerHTML = `${ico(a.kind === 'video' ? 'video' : a.kind === 'topic' ? 'book' : 'page')}<span>Asking about: <b>${esc(a.label)}</b> <span class="muted">${esc(a.sub || '')}</span></span>${cur && cur.messages.length ? '' : '<button type="button" aria-label="Don’t use this as context" id="ctxX">×</button>'}`;
+    el.innerHTML = `${ico(a.kind === 'video' ? 'video' : a.kind === 'topic' ? 'book' : 'page')}<span>${I18n.t("chat.renderctx.asking_about")} <b>${esc(a.label)}</b> <span class="muted">${esc(a.sub || '')}</span></span>${cur && cur.messages.length ? '' : `<button type="button" aria-label="${I18n.t("chat.renderctx.don_t_use_this_as_context")}" id="ctxX">×</button>`}`;
     const x = $('#ctxX'); if (x) x.onclick = () => { aboutCtx = null; renderCtx(); renderLog() };
   }
   function renderSide() {
     const el = $('#csList'); if (!el) return;
-    el.innerHTML = chats.length ? chats.map(c => `<li><a href="#/ask/${c.id}" ${cur && cur.id === c.id ? 'aria-current="page"' : ''}><b>${esc(c.title)}</b><small>${new Date(c.updated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${c.messages.filter(m => m.role === 'user').length} question${c.messages.filter(m => m.role === 'user').length > 1 ? 's' : ''}</small></a><button class="iconbtn" data-del="${c.id}" aria-label="Delete this chat">×</button></li>`).join('')
-      : '<li class="muted small" style="padding:8px 4px">No chats yet.</li>';
+    el.innerHTML = chats.length ? chats.map(c => `<li><a href="#/ask/${c.id}" ${cur && cur.id === c.id ? 'aria-current="page"' : ''}><b>${esc(c.title)}</b><small>${I18n.french ? I18n.date(c.updated) : new Date(c.updated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${c.messages.filter(m => m.role === 'user').length} ${I18n.t("common.question_word")}${c.messages.filter(m => m.role === 'user').length > 1 ? 's' : ''}</small></a><button class="iconbtn" data-del="${c.id}" aria-label="${I18n.t("chat.renderside.delete_this_chat")}">×</button></li>`).join('')
+      : `<li class="muted small" style="padding:8px 4px">${I18n.t("chat.renderside.no_chats_yet")}</li>`;
     const clr = $('#clearChats'); if (clr) clr.hidden = !chats.length;   // nothing to delete
     $$('[data-del]', el).forEach(b => b.onclick = () => { const id = b.dataset.del; live[id]?.abort?.(); chats = chats.filter(c => c.id !== id); persist(); if (cur && cur.id === id) location.hash = '#/ask'; else renderSide() });
     // the list fades at an edge with more chats past it, so a row cut off there reads as more to scroll to
@@ -191,10 +192,10 @@ const Chat = (() => {
       const st = aboutCtx ? ABOUT_STARTERS[aboutCtx.kind] || [] : null;
       log.innerHTML = `<div class="chat-empty">
         <div class="ce-mark">${ico('ask')}</div>
-        <h1>Chat</h1>
-        <p class="lead">Answers are built only from the manuals, guides and video transcripts on this computer — with the exact page or video moment for each point.</p>
+        <h1>${I18n.t("nav.chat")}</h1>
+        <p class="lead">${I18n.t("chat.renderlog.answers_are_built_only_from_the")}</p>
         <div class="starters">${(st ? st.map(t => ['ask', t]) : STARTERS).map(([i, t]) => `<button class="starter" ${tcStyle(i)} data-start="${esc(t)}"><span class="ico">${ico(i)}</span><span>${esc(t)}</span></button>`).join('')}</div>
-        <p class="small muted" style="margin-top:18px">It reads text only: it can’t see inside videos without captions, scanned pages without text, or raw map files. It tells you when the library has nothing on a question.</p></div>`;
+        <p class="small muted" style="margin-top:18px">${I18n.t("chat.renderlog.it_reads_text_only_it_can")}</p></div>`;
       $$('[data-start]', log).forEach(b => b.onclick = () => send(b.dataset.start));
       fitEmpty();
       return;
@@ -224,21 +225,21 @@ const Chat = (() => {
     const steps = (m.steps || []).map(s => `<li>${stepText(s)}</li>`).join('');
     const found = m.sources || [];
     let h = '';
-    if (running) h += `<div class="working"><b>${esc(STATES[m.state] || 'Working…')}${m.state === 'starting' && m.pct ? ` ${m.pct}%` : ''}</b>${progress(m)}${steps ? `<ul class="steps">${steps}</ul>` : ''}</div>`;
-    if (m.error) h += `<div class="ans-error">${ico('warn')}<div><b>${esc(m.error)}</b>${m.offline ? '<p>You can keep browsing and searching. Here are the pages that best match your question:</p>' : ''}</div></div>`;
+    if (running) h += `<div class="working"><b>${esc(STATES[m.state] || I18n.t("chat.bothtml.working"))}${m.state === 'starting' && m.pct ? ` ${m.pct}%` : ''}</b>${progress(m)}${steps ? `<ul class="steps">${steps}</ul>` : ''}</div>`;
+    if (m.error) h += `<div class="ans-error">${ico('warn')}<div><b>${esc(I18n.error(m.error))}</b>${m.offline ? `<p>${I18n.t("chat.bothtml.you_can_keep_browsing_and_searching")}</p>` : ''}</div></div>`;
     if (m.content) h += `<div class="answer">${md(m.content, m)}</div>`;
-    if (running && found.length) h += `<div class="prefound"><p class="small muted">Pages found so far — you can open them while the answer is written:</p>${srcCards(found.slice(0, 6), true)}</div>`;
+    if (running && found.length) h += `<div class="prefound"><p class="small muted">${I18n.t("chat.bothtml.pages_found_so_far_you_can")}</p>${srcCards(found.slice(0, 6), true)}</div>`;
     if (m.fallback) h += srcCards(m.fallback, true);
     if (!running && m.content) {
       const cited = m.cited || [];
-      if ((m.invalid || []).length) h += `<p class="small" style="color:var(--stop)">The model referred to sources that don’t exist (${m.invalid.join(', ')}); those markers were removed.</p>`;
-      h += `<div class="legend small"><span><span class="lg-c">1</span> linked to a page or video</span><span><span class="lg-u">dotted</span> the model’s own wording, not linked to a source</span></div>`;
-      if (cited.length) h += `<h3 class="srch">Sources (${cited.length})</h3>${srcCards(cited, false)}`;
-      else h += `<p class="notice small">This answer has no linked sources. Treat it as unverified.</p>`;
+      if ((m.invalid || []).length) h += `<p class="small" style="color:var(--stop)">${I18n.t("chat.bothtml.the_model_referred_to_sources_that")}${m.invalid.join(', ')}${I18n.t("chat.bothtml.those_markers_were_removed")}</p>`;
+      h += `<div class="legend small"><span><span class="lg-c">1</span> ${I18n.t("chat.bothtml.linked_to_a_page_or_video")}</span><span><span class="lg-u">${I18n.t("chat.bothtml.dotted")}</span> ${I18n.t("chat.bothtml.the_model_s_own_wording_not")}</span></div>`;
+      if (cited.length) h += `<h3 class="srch">${I18n.t("chat.bothtml.sources")}${cited.length})</h3>${srcCards(cited, false)}`;
+      else h += `<p class="notice small">${I18n.t("chat.bothtml.this_answer_has_no_linked_sources")}</p>`;
       const other = (m.consulted || []).filter(s => s.kind !== 'place');
-      if (other.length) h += `<details class="also"><summary>Also looked at (${other.length}, not used)</summary>${srcCards(other.slice(0, 10), true)}</details>`;
-      if ((m.steps || []).length) h += `<details class="also"><summary>How it searched (${m.steps.length} ${m.steps.length === 1 ? 'step' : 'steps'}${m.latency ? `, ${m.latency.total_s}s` : ''})</summary><ul class="steps">${steps}</ul></details>`;
-      h += `<div class="ans-actions"><button class="btn plain" data-act="copy" data-i="${i}">Copy</button><button class="btn plain" data-act="save" data-i="${i}">${ico('save')}Save answer</button><button class="btn plain" data-act="export">Export chat</button>${i === cur.messages.length - 1 ? `<button class="btn plain" data-act="retry">Ask again</button>` : ''}</div>`;
+      if (other.length) h += `<details class="also"><summary>${I18n.t("chat.bothtml.also_looked_at")}${other.length}${I18n.t("chat.bothtml.not_used")}</summary>${srcCards(other.slice(0, 10), true)}</details>`;
+      if ((m.steps || []).length) h += `<details class="also"><summary>${I18n.t("chat.bothtml.how_it_searched")}${m.steps.length} ${m.steps.length === 1 ? I18n.t('chat.steps.one') : I18n.t('chat.steps.many')}${m.latency ? `, ${m.latency.total_s}s` : ''})</summary><ul class="steps">${steps}</ul></details>`;
+      h += `<div class="ans-actions"><button class="btn plain" data-act="copy" data-i="${i}">${I18n.t("chat.bothtml.copy")}</button><button class="btn plain" data-act="save" data-i="${i}">${ico('save')}${I18n.t("chat.bothtml.save_answer")}</button><button class="btn plain" data-act="export">${I18n.t("chat.bothtml.export_chat")}</button>${i === cur.messages.length - 1 ? `<button class="btn plain" data-act="retry">${I18n.t("chat.bothtml.ask_again")}</button>` : ''}</div>`;
     }
     return h;
   }
@@ -247,40 +248,40 @@ const Chat = (() => {
     const plain = v => typeof v === 'string' || typeof v === 'number' ? v : '';
     const raw = s.args && typeof s.args === 'object' ? s.args : {}, r = s.summary || {};
     const a = { query: plain(raw.query), kind: plain(raw.kind), doc_id: plain(raw.doc_id), page: plain(raw.page), pages: raw.pages };
-    if (s.name === 'search_library') return `Searched “${esc(a.query || '')}”${a.kind && a.kind !== 'any' ? ' (' + esc(a.kind) + 's)' : ''} — ${r.count ?? '…'} passage${r.count === 1 ? '' : 's'}`;
+    if (s.name === 'search_library') return `${I18n.t("chat.steptext.searched")}${esc(a.query || '')}”${a.kind && a.kind !== 'any' ? ' (' + esc(I18n.french ? I18n.t('chat.steps.' + a.kind) : a.kind + 's') + ')' : ''} — ${r.count ?? '…'} ${I18n.t("common.passage_word")}${r.count === 1 ? '' : 's'}`;
     if (s.name === 'read_pages') {
       const pages = (Array.isArray(a.pages) ? a.pages : [a.pages]).filter(p => typeof p === 'number' || typeof p === 'string');
-      return r.error ? 'Tried to read an unknown document' : `Read ${esc(r.title || a.doc_id)}, page${pages.length > 1 ? 's' : ''} ${esc(pages.join(', '))}`;
+      return r.error ? I18n.t("chat.steptext.tried_to_read_an_unknown_document") : `${I18n.t("chat.steps.read")} ${esc(r.title || a.doc_id)}${I18n.t("chat.steptext.page")}${pages.length > 1 ? 's' : ''} ${esc(pages.join(', '))}`;
     }
-    if (s.name === 'view_page') return r.error ? 'Couldn’t view that page' : `Looked at the picture of ${esc(r.title || '')}, page ${esc(a.page)}`;
-    if (s.name === 'get_timed_transcript') return r.error ? `No transcript for ${esc(r.title || 'that video')}` : `Read the transcript of ${esc(r.title || '')}`;
-    if (s.name === 'lookup_place') return `Looked up “${esc(a.query || '')}” on the offline map`;
-    if (s.name === 'found') return `Matched ${s.count} passage${s.count === 1 ? '' : 's'} for your question`;
+    if (s.name === 'view_page') return r.error ? I18n.t("chat.steptext.couldn_t_view_that_page") : `${I18n.t("chat.steptext.looked_at_the_picture_of")} ${esc(r.title || '')}${I18n.t("chat.steptext.page")} ${esc(a.page)}`;
+    if (s.name === 'get_timed_transcript') return r.error ? `${I18n.t("chat.steptext.no_transcript_for")} ${esc(r.title || I18n.t("chat.steptext.that_video"))}` : `${I18n.t("chat.steptext.read_the_transcript_of")} ${esc(r.title || '')}`;
+    if (s.name === 'lookup_place') return `${I18n.t("chat.steptext.looked_up")}${esc(a.query || '')}${I18n.t("chat.steptext.on_the_offline_map")}`;
+    if (s.name === 'found') return `${I18n.t("common.matched")} ${s.count} ${I18n.t("common.passage_word")}${s.count === 1 ? '' : 's'} ${I18n.t("chat.steptext.for_your_question")}`;
     return esc(s.name);
   }
   function srcHref(s) {
-    if (s.kind === 'place') return `#/map?lat=${s.lat}&lon=${s.lon}&z=16&pin=${encodeURIComponent(s.title || s.name || 'Place from the answer')}`;
+    if (s.kind === 'place') return `#/map?lat=${s.lat}&lon=${s.lon}&z=16&pin=${encodeURIComponent(s.title || s.name || I18n.t("chat.srchref.place_from_the_answer"))}`;
     if (s.kind === 'video') return `#/watch/${encodeURIComponent(s.doc_id)}?${s.t != null ? 't=' + Math.floor(s.t) + '&' : ''}from=${encodeURIComponent(here())}`;
     return `#/read/${encodeURIComponent(s.doc_id)}?${s.page ? 'p=' + s.page + '&' : ''}from=${encodeURIComponent(here())}`;
   }
   function srcCards(list, compact) {
     return `<div class="srccards ${compact ? 'compact' : ''}">${list.map(s => {
       let pv;
-      if (s.kind === 'video') pv = `<span class="pv v">${s.thumb ? `<img loading="lazy" alt="" src="${fileUrl(s.thumb)}">` : ''}<span class="pg">${s.t != null ? clock(s.t) : 'video'}</span></span>`;
+      if (s.kind === 'video') pv = `<span class="pv v">${s.thumb ? `<img loading="lazy" alt="" src="${fileUrl(s.thumb)}">` : ''}<span class="pg">${s.t != null ? clock(s.t) : I18n.t('app.videorow.video')}</span></span>`;
       else if (s.kind === 'pdf' && s.page) pv = `<span class="pv"><img loading="lazy" alt="" src="/api/page/${encodeURIComponent(s.doc_id)}/${s.page}.png?w=300" onerror="this.remove()"><span class="pg">p. ${s.page}</span></span>`;
       else pv = `<span class="pv w">${ico(s.kind === 'place' ? 'pin' : 'page')}</span>`;
-      const where = s.kind === 'video' ? (s.t != null ? 'at ' + clock(s.t) : '') : s.page ? `page ${s.page}${s.pages ? ' of ' + s.pages : ''}` : '';
+      const where = s.kind === 'video' ? (s.t != null ? I18n.t("common.at_word") + " " + clock(s.t) : '') : s.page ? `${I18n.t("chat.where.page")} ${s.page}${s.pages ? ' ' + I18n.t('common.of_word') + ' ' + s.pages : ''}` : '';
       return `<a class="srccard" href="${srcHref(s)}" id="src-${esc(s.key || '')}">${pv}<span class="sc-body">${s.key ? `<span class="sc-key">${esc(s.key.replace(/^S/, ''))}</span>` : ''}<b>${esc(s.title)}</b>
-        <small>${esc(s.publisher || '')}${s.year ? ' · ' + esc(s.year) : ''}${where ? ' · ' + where : ''}${s.trust ? ' · ' + esc(s.trust) : ''}</small>
+        <small>${esc(s.publisher || '')}${s.year ? ' · ' + esc(s.year) : ''}${where ? ' · ' + where : ''}${s.trust ? ' · ' + esc(I18n.label(s.trust)) : ''}</small>
         ${!compact && s.excerpt ? `<span class="sc-ex">“${esc(s.excerpt.slice(0, 220))}${s.excerpt.length > 220 ? '…' : ''}”</span>` : ''}
-        ${s.image ? '<span class="sc-tag">diagram viewed</span>' : ''}</span></a>`;
+        ${s.image ? `<span class="sc-tag">${I18n.t("chat.srccards.diagram_viewed")}</span>` : ''}</span></a>`;
     }).join('')}</div>`;
   }
 
   /* markdown-lite with citation chips; sentences without a citation are marked as the model's own wording */
   function md(text, m) {
     const keys = new Set((m.cited || m.sources || []).map(s => s.key));
-    const cite = k => keys.has(k) || !m.cited ? `<a class="cite" href="#src-${k}" data-key="${k}" title="Source ${k}">${k.replace(/^S/, '')}</a>` : '';
+    const cite = k => keys.has(k) || !m.cited ? `<a class="cite" href="#src-${k}" data-key="${k}" title="${I18n.t("common.source")} ${k}">${k.replace(/^S/, '')}</a>` : '';
     const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|\W)\*(?!\s)(.+?)\*(?=\W|$)/g, '$1<em>$2</em>')
       .replace(/\[([SM]\d+)\]/g, (_, k) => cite(k));
     const lines = text.replace(/\r/g, '').split('\n');
@@ -288,7 +289,7 @@ const Chat = (() => {
     const close = () => { if (list) { out += `</${list}>`; list = null } };
     const mark = raw => {  // wrap sentences that carry no citation (main sections only)
       if (section !== 'main' || m.running) return inline(raw);
-      return raw.split(/(?<=[.!?])\s+(?=[A-Z(“"])/).map(sn => /\[[SM]\d+\]/.test(sn) || sn.replace(/\*|_/g, '').trim().length < 28 || /:$/.test(sn.trim()) ? inline(sn) : `<span class="uncited" title="Not linked to a source">${inline(sn)}</span>`).join(' ');
+      return raw.split(/(?<=[.!?])\s+(?=[A-Z(“"])/).map(sn => /\[[SM]\d+\]/.test(sn) || sn.replace(/\*|_/g, '').trim().length < 28 || /:$/.test(sn.trim()) ? inline(sn) : `<span class="uncited" title="${I18n.t("chat.mark.not_linked_to_a_source")}">${inline(sn)}</span>`).join(' ');
     };
     for (let ln of lines) {
       const t = ln.trim();
@@ -300,7 +301,7 @@ const Chat = (() => {
         close();
         if (out.includes('<div class="sec-')) out += '</div>';
         section = sec || (head ? 'main' : section);
-        if (sec) { out += `<div class="sec-${sec}"><h4>${sec === 'missing' ? 'Not found in the library' : sec === 'disagree' ? 'Sources disagree' : 'The model’s own reasoning — not from the library'}</h4>`; const rest = t.replace(/^[#*\s]*(not found in the library|sources disagree|my own reasoning \(not from the library\)|my own reasoning)[:*\s]*/i, ''); if (rest) out += `<p>${inline(rest)}</p>`; continue }
+        if (sec) { out += `<div class="sec-${sec}"><h4>${sec === 'missing' ? I18n.t("chat.md.not_found_in_the_library") : sec === 'disagree' ? I18n.t("app.disagree.sources_disagree") : I18n.t("chat.md.the_model_s_own_reasoning_not")}</h4>`; const rest = t.replace(/^[#*\s]*(not found in the library|sources disagree|my own reasoning \(not from the library\)|my own reasoning)[:*\s]*/i, ''); if (rest) out += `<p>${inline(rest)}</p>`; continue }
         out += `<h4>${inline(hText.replace(/:$/, ''))}</h4>`; continue;
       }
       const ul = /^[-*•]\s+(.*)$/.exec(t), ol = /^(\d+)[.)]\s+(.*)$/.exec(t);
@@ -319,10 +320,10 @@ const Chat = (() => {
   function wire(el) {
     $$('[data-act]', el).forEach(b => b.onclick = () => {
       const i = +b.dataset.i, m = cur.messages[i];
-      if (b.dataset.act === 'copy') { navigator.clipboard?.writeText(plain(m)).then(() => toast('Copied'), () => toast('Couldn’t copy')) }
+      if (b.dataset.act === 'copy') { navigator.clipboard?.writeText(plain(m)).then(() => toast(I18n.t("common.copied")), () => toast(I18n.t("chat.wire.couldn_t_copy"))) }
       if (b.dataset.act === 'save') {
         const q = cur.messages[i - 1]?.content || cur.title;
-        toggleSave({ key: `a:${cur.id}:${i}`, title: 'Answer: ' + q.slice(0, 80), href: '#/ask/' + cur.id, sub: `${(m.cited || []).length} sources · ${new Date().toLocaleDateString()}` }, null);
+        toggleSave({ key: `a:${cur.id}:${i}`, title: I18n.t("chat.wire.answer") + " " + q.slice(0, 80), href: '#/ask/' + cur.id, sub: `${(m.cited || []).length} ${I18n.t("chat.wire.sources")} ${I18n.french ? I18n.date(Date.now()) : new Date().toLocaleDateString()}` }, null);
       }
       if (b.dataset.act === 'export') exportChat(cur);
       if (b.dataset.act === 'retry') { const q = cur.messages[cur.messages.length - 2]?.content; cur.messages.splice(-2, 2); send(q) }
@@ -333,24 +334,24 @@ const Chat = (() => {
   function plain(m) {
     const map = Object.fromEntries((m.cited || []).map(s => [s.key, s]));
     let t = m.content.replace(/\[([SM]\d+)\]/g, (_, k) => map[k] ? `[${k.replace(/^S/, '')}]` : '');
-    if ((m.cited || []).length) t += '\n\nSources:\n' + m.cited.map(s => `[${s.key.replace(/^S/, '')}] ${s.title} — ${s.publisher || ''}${s.year ? ', ' + s.year : ''}${s.page ? ', page ' + s.page : ''}${s.t != null ? ', at ' + clock(s.t) : ''}  ${location.origin}/${srcHref(s).replace(/&?from=[^&]*/, '')}`).join('\n');
+    if ((m.cited || []).length) t += "\n\n" + I18n.t("chat.plain.sources") + "\n" + m.cited.map(s => `[${s.key.replace(/^S/, '')}] ${s.title} — ${s.publisher || ''}${s.year ? ', ' + s.year : ''}${s.page ? I18n.t("chat.steptext.page") + " " + s.page : ''}${s.t != null ? I18n.t("chat.plain.at") + " " + clock(s.t) : ''}  ${location.origin}/${srcHref(s).replace(/&?from=[^&]*/, '')}`).join('\n');
     return t;
   }
   function exportChat(c) {
-    let md = `# ${c.title}\n\nExported from Lastbook (offline library) on ${new Date().toLocaleString()}.\nAnswers were written by a local AI model from the library's documents. Check the linked pages; get trained help for anything serious.\n`;
-    for (const m of c.messages) md += m.role === 'user' ? `\n## Question\n\n${m.content}\n` : `\n## Answer\n\n${m.content ? plain(m) : '(no answer: ' + (m.error || 'stopped') + ')'}\n`;
+    let md = `# ${c.title}${I18n.t("chat.md.n_nexported_from_lastbook_offline_library")} ${new Date().toLocaleString(I18n.french ? 'fr-FR' : undefined)}${I18n.t('chat.export.notice')}`;
+    for (const m of c.messages) md += m.role === 'user' ? `${I18n.t("chat.exportchat.n_question_n_n")}${m.content}\n` : `${I18n.t("chat.exportchat.n_answer_n_n")}${m.content ? plain(m) : I18n.t('chat.export.no_answer') + (m.error || I18n.t('chat.export.stopped')) + ')'}\n`;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
     a.download = `survival-chat-${new Date().toISOString().slice(0, 10)}.md`;
     document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 500);
-    toast('Saved as a file on this device');
+    toast(I18n.t("chat.exportchat.saved_as_a_file_on_this"));
   }
   // Earlier answers' [S#] keys only mean something inside their own turn; give the model readable references instead.
   function history_(c) {
     return c.messages.filter(m => m.content).map(m => {
       if (m.role !== 'assistant') return { role: m.role, content: m.content };
       const map = Object.fromEntries((m.cited || []).map(s => [s.key, s]));
-      return { role: 'assistant', content: m.content.replace(/\[([SM]\d+)\]/g, (_, k) => map[k] ? `(${map[k].title}${map[k].page ? ', p. ' + map[k].page : ''}${map[k].t != null ? ', ' + clock(map[k].t) : ''})` : '') };
+      return { role: 'assistant', content: m.content.replace(/\[([SM]\d+)\]/g, (_, k) => map[k] ? `(${map[k].title}${map[k].page ? I18n.t('common.page_short') + ' ' + map[k].page : ''}${map[k].t != null ? ', ' + clock(map[k].t) : ''})` : '') };
     });
   }
 
@@ -377,7 +378,7 @@ const Chat = (() => {
       const st = await getStatus();
       if (!st.online) throw Object.assign(new Error('offline'), { offline: true, why: st.local && localLine(st.local)[1] });
       const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: history_(c).slice(0, -1).concat([{ role: 'user', content: text }]), about: c.about }), signal: ctl.signal });
-      if (!r.ok || !r.body) throw new Error('The server refused the question (' + r.status + ').');
+      if (!r.ok || !r.body) throw new Error(I18n.t("chat.send.the_server_refused_the_question") + r.status + ').');
       const rd = r.body.getReader(), dec = new TextDecoder();
       let buf = '';
       for (;;) {
@@ -393,14 +394,14 @@ const Chat = (() => {
           redraw();
         }
       }
-      if (m.running && !m.content && !m.error) m.error = 'The answer stopped unexpectedly.';
+      if (m.running && !m.content && !m.error) m.error = I18n.t("chat.send.the_answer_stopped_unexpectedly");
     } catch (e) {
-      if (e.name === 'AbortError') { m.stopped = true; if (!m.content) m.error = 'Stopped.' }
-      else if (e.offline || /model_unavailable/.test(e.message)) { m.offline = true; m.error = e.why || 'The local assistant model isn’t running right now.'; await fallback(m, text) }
-      else m.error = e.message || 'Something went wrong.';
+      if (e.name === 'AbortError') { m.stopped = true; if (!m.content) m.error = I18n.t("chat.send.stopped") }
+      else if (e.offline || /model_unavailable/.test(e.message)) { m.offline = true; m.error = e.why || I18n.t("chat.send.the_local_assistant_model_isn_t"); await fallback(m, text) }
+      else m.error = e.message || I18n.t("app.errorbox.something_went_wrong");
     }
     m.running = false; delete m.state;
-    if (m.stopped && m.content) m.content += '\n\n(Stopped.)';
+    if (m.stopped && m.content) m.content += I18n.t('chat.stopped_note');
     live[c.id].running = false;
     c.updated = Date.now(); persist();
     if (cur === c) { updateBot(idx); setBusy(false); scrollEnd(); const t = $('#chatIn'); if (t && matchMedia('(hover:hover)').matches) t.focus({ preventScroll: true }) }
@@ -420,14 +421,14 @@ const Chat = (() => {
     else if (ev.type === 'stopped') m.stopped = true;
   }
   async function fallback(m, q) {
-    try { const d = await api('/api/retrieve?q=' + encodeURIComponent(q) + '&k=8'); m.fallback = d.results.map((r, i) => ({ ...r, key: '' })); if (!m.fallback.length) m.error += ' The library search also found nothing for this question.' }
+    try { const d = await api('/api/retrieve?q=' + encodeURIComponent(q) + '&k=8'); m.fallback = d.results.map((r, i) => ({ ...r, key: '' })); if (!m.fallback.length) m.error += " " + I18n.t("chat.fallback.the_library_search_also_found_nothing") }
     catch { m.fallback = [] }
   }
   function stop() { if (cur && live[cur.id]) live[cur.id].abort() }
   function setBusy(on) {
     const b = $('#sendBtn'); if (!b) return;
     b.innerHTML = on ? '<span class="stopsq"></span>' : ico('up');
-    b.setAttribute('aria-label', on ? 'Stop the answer' : 'Send');
+    b.setAttribute('aria-label', on ? I18n.t("chat.setbusy.stop_the_answer") : I18n.t("chat.composer.send"));
     b.classList.toggle('stop', on);
   }
   function scrollEnd(force) {

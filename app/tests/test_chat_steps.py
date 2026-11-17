@@ -8,7 +8,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 NODE = shutil.which('node')
 RUN = r"""
-const fs = require('fs');
+const fs = require('fs'), path = require('path');
+const web = path.dirname(process.argv[1]);
+require(path.join(web, 'i18n.js'));
+I18n.configure(JSON.parse(fs.readFileSync(path.join(web, 'i18n/en.json'), 'utf8')), {}, 'en');
 const chat = fs.readFileSync(process.argv[1], 'utf8'), app = fs.readFileSync(process.argv[2], 'utf8');
 const esc = app.split('\n').find(l => /^const esc\s*=/.test(l));
 const i = chat.indexOf('function stepText('), j = chat.indexOf('\n  function srcHref');

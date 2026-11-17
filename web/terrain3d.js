@@ -1,3 +1,7 @@
+// Match the 2D map's neutral land outside a non-US terrain mesh.
+const TerrainStyle = {
+  surround: country => country && country !== 'US' ? [242 / 255, 239 / 255, 230 / 255, 1] : [0.62, 0.76, 0.84, 1],
+};
 'use strict';
 /* 3D terrain view: the current map view as a textured elevation mesh (WebGL, no libraries).
    Drag to rotate, scroll or pinch to zoom, shift-drag or two-finger drag to tilt. */
@@ -62,9 +66,9 @@ const Terrain3D = (() => {
   async function open(wrap, o) {
     close();
     const box = document.createElement('div'); box.className = 't3d';
-    box.innerHTML = `<canvas></canvas><div class="bar"><button data-a="exit">✕ Exit 3D</button>
-      <label title="Exaggerate heights">Height ×<input type="range" min="1" max="5" step="0.5" value="${o.z < 10 ? 3 : 1.5}"><span></span></label>
-      <button data-a="reset">Reset view</button></div><div class="hint">Loading elevation…</div>`;
+    box.innerHTML = `<canvas></canvas><div class="bar"><button data-a="exit">${I18n.t("map.terrain.exit")}</button>
+      <label title="${I18n.t("map.terrain.exaggerate")}">${I18n.t("map.terrain.height")}<input type="range" min="1" max="5" step="0.5" value="${o.z < 10 ? 3 : 1.5}"><span></span></label>
+      <button data-a="reset">${I18n.t("map.terrain.reset")}</button></div><div class="hint">${I18n.t("map.terrain.loading")}</div>`;
     wrap.appendChild(box);
     const cv = box.querySelector('canvas'), hint = box.querySelector('.hint'), range = box.querySelector('input');
     const me = cur = { box, alive: true };  // this session: checks after each await use me, not whatever cur is by then
@@ -87,7 +91,7 @@ const Terrain3D = (() => {
       let waiting = 0;
       for (const k of need) { const [z, x, y] = k.split('/').map(Number); if (o.getDem(z, x, y) === undefined) { o.demTile(z, x, y); waiting++ } }
       if (!waiting || !me.alive) break;
-      hint.textContent = `Loading elevation… ${need.size - waiting}/${need.size}`;
+      hint.textContent = `${I18n.t("map.terrain.loading")} ${need.size - waiting}/${need.size}`;
       await new Promise(r => setTimeout(r, 150));
     }
     if (!me.alive) return;
@@ -106,7 +110,7 @@ const Terrain3D = (() => {
     let hmin = Infinity, hmax = -Infinity;
     for (let j = 0; j <= M; j++) for (let i = 0; i <= N; i++) { const v = height(latAt(j), lonAt(i)); hts[j * (N + 1) + i] = v; if (v < hmin) hmin = v; if (v > hmax) hmax = v }
     const gl = cv.getContext('webgl', { antialias: true, preserveDrawingBuffer: false });
-    if (!gl) { hint.textContent = '3D needs WebGL, which this browser has turned off.'; return }
+    if (!gl) { hint.textContent = I18n.t("terrain3d.open.3d_needs_webgl_which_this_browser"); return }
     const prog = program(gl, VS, FS), bprog = program(gl, BVS, BFS);
     gl.useProgram(prog);
     const pos = new Float32Array((N + 1) * (M + 1) * 3), uv = new Float32Array((N + 1) * (M + 1) * 2), nrm = new Float32Array((N + 1) * (M + 1) * 3);
@@ -165,7 +169,7 @@ const Terrain3D = (() => {
       B.count = P.length / 3;
     }
     async function loadBldg() {
-      if (W > BLDG_MAX_SPAN || Hm > BLDG_MAX_SPAN) return 'Zoom in to a town to see 3D buildings.';
+      if (W > BLDG_MAX_SPAN || Hm > BLDG_MAX_SPAN) return I18n.t("terrain3d.loadbldg.zoom_in_to_a_town_to");
       const sc = 2 ** (30 - Z), X0 = (cx - hw) * sc, X1 = (cx + hw) * sc, Y0 = (cy - hh) * sc, Y1 = (cy + hh) * sc;
       const tiles = [];
       for (let ty = Math.floor(Y0 / 65536); ty <= Math.floor(Y1 / 65536); ty++)
@@ -224,7 +228,7 @@ const Terrain3D = (() => {
       B.list = list; buildBldg(ex); render();
       if (!list.length) return '';
       const measured = list.filter(f => f.osm).length, guessed = list.filter(f => !f.est).length;
-      return `${list.length.toLocaleString()} buildings${capped ? ' (nearest shown)' : ''} · ${measured ? `${measured.toLocaleString()} with mapped heights (OpenStreetMap), the rest ` : 'heights are '}satellite estimates${guessed ? `; ${guessed.toLocaleString()} without one shown one storey tall` : ''}`;
+      return `${list.length.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("common.buildings_word")}${capped ? " " + I18n.t("common.nearest_shown") : ''} · ${measured ? `${measured.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("terrain3d.loadbldg.with_mapped_heights_openstreetmap_the_rest")} ` : I18n.t("terrain3d.loadbldg.heights_are") + " "}${I18n.t("terrain3d.loadbldg.satellite_estimates")}${guessed ? `; ${guessed.toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${I18n.t("terrain3d.loadbldg.without_one_shown_one_storey_tall")}` : ''}`;
     }
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
     // the 2D map (streets, labels, pins) becomes the ground texture
@@ -242,14 +246,14 @@ const Terrain3D = (() => {
     const home = { yaw: -0.35, pitch: 0.62, dist: Math.max(W, Hm) * 1.05 };
     const cam = { ...home };
     let ex = +range.value;
-    const setEx = () => { ex = +range.value; box.querySelector('.bar span').textContent = ex.toFixed(1); build(ex); render() };
+    const setEx = () => { ex = +range.value; box.querySelector('.bar span').textContent = I18n.fixed(ex, 1); build(ex); render() };
     range.oninput = setEx;
     box.querySelector('[data-a=reset]').onclick = () => { Object.assign(cam, home); render() };
     function render() {
       if (!me.alive) return;
       const w = cv.clientWidth, h = cv.clientHeight, R = Math.min(2, devicePixelRatio || 1);
       if (cv.width !== Math.round(w * R)) { cv.width = Math.round(w * R); cv.height = Math.round(h * R) }
-      gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(0.62, 0.76, 0.84, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(...TerrainStyle.surround(o.country)); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       const zc = (hmax - hmin) * ex * 0.3, e = [Math.sin(cam.yaw) * Math.cos(cam.pitch) * cam.dist, -Math.cos(cam.yaw) * Math.cos(cam.pitch) * cam.dist, Math.sin(cam.pitch) * cam.dist + zc];
       const mvp = mat(0.8, w / h, e, [0, 0, zc]);
       gl.useProgram(prog); attrs(prog, [[pb, 'p', 3], [ub, 'uv', 2], [nb, 'n', 3]]);
@@ -281,9 +285,9 @@ const Terrain3D = (() => {
     me.ro = new ResizeObserver(render); me.ro.observe(cv);
     setEx();
     const rel = hmax - hmin;
-    const factor = MapFormat.contourFactor(o.units), unit = o.units === 'metric' ? 'm' : 'ft';
-    const base = rel < 1 ? (o.country && o.country !== 'US' ? 'No elevation data here.' : 'No elevation data here (ocean or outside the US).') : `${matchMedia('(pointer: coarse)').matches ? 'Drag to turn and tilt · pinch to zoom' : 'Drag to rotate · scroll to zoom · shift-drag to tilt'} · ${Math.round(hmin * factor).toLocaleString()}–${Math.round(hmax * factor).toLocaleString()} ${unit}`;
-    hint.textContent = base + (W <= BLDG_MAX_SPAN && Hm <= BLDG_MAX_SPAN ? ' · loading buildings…' : '');
+    const factor = MapFormat.contourFactor(o.units), unit = o.units === 'metric' || I18n.french ? 'm' : 'ft';
+    const base = rel < 1 ? (o.country && o.country !== 'US' ? I18n.t("terrain3d.base.no_elevation_data_here") : I18n.t("terrain3d.base.no_elevation_data_here_ocean_or")) : `${matchMedia('(pointer: coarse)').matches ? I18n.t("map.terrain.touch_help") : I18n.t("map.terrain.mouse_help")} · ${Math.round(hmin * factor).toLocaleString(I18n.french ? 'fr-FR' : undefined)}–${Math.round(hmax * factor).toLocaleString(I18n.french ? 'fr-FR' : undefined)} ${unit}`;
+    hint.textContent = base + (W <= BLDG_MAX_SPAN && Hm <= BLDG_MAX_SPAN ? " " + I18n.t("terrain3d.open.loading_buildings") : '');
     const note = await loadBldg();
     if (!me.alive) return;
     hint.textContent = note ? `${base} · ${note}` : base;
